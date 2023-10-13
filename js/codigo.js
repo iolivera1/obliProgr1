@@ -28,3 +28,20 @@ function mostrarPagina(id) {
   document.querySelector(id).style.display = "block";
 }
 
+function crearUsuario()
+{
+    let nombre = document.querySelector("#txtNombreRegisto").value;
+    let apellido = document.querySelector("#txtApellidoRegisto").value;
+    let userName = document.querySelector("#txtUsernameRegistro").value;
+    let contrasenia = document.querySelector("#txtContraseniaRegistro").value;
+    let repeticionContrasenia = document.querySelector("#txtContraseniaRepeticionRegistro").value;
+    let nroTarjetaCredito = document.querySelector("#txtTarjetaCreditoNumero").value;
+    let cvc = document.querySelector("#txtCVC").value;
+
+    sistema.crearUsuario()
+}
+
+
+//eventos fijos
+
+document.querySelector("#btnCrearUsuario").addEventListener("click", crearUsuario);

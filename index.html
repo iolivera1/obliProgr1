@@ -10,7 +10,7 @@
       <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
     </div>
 
-    <div class="seccionPagina" id="divLoginUsuario" style="display: none">
+    <div class="seccionPagina" id="divLoginUsuario" style="display: block">
       <h3>Por favor, realiza el Login</h3>
       <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
       <input type="text" id="txtUsernameoLogin" />
@@ -22,7 +22,7 @@
       <button id="btnLogin">Login</button>
       <button
         class="btnNavegacion"
-        id="btnCrearUsuario"
+        id="btnEnviarLoginUsuario"
         data-mostrar="divRegistroUsuarioNuevo"
       >
         Crear Usuario
@@ -59,10 +59,10 @@
         <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
         <input type="text" id="txtTarjetaCreditoNumero" />
         <br />
-        <label for="txtApellidoRegisto">CVC:</label>
-        <input type="text" id="txtTarjetaCreditoCVC" />
+        <label for="txtCVC">CVC:</label>
+        <input type="text" id="txtCVC" />
       </div>
-      <button id="btnEnviarLoginUsuario">Enviar</button>
+      <button id="btnCrearUsuario">Enviar</button>
       <button
         class="btnNavegacion"
         id="btnYaTengoUsuario"
@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <div class="seccionPagina" id="divStockInstancias" style="display: block">
+    <div class="seccionPagina" id="divStockInstancias" style="display: none">
       <p>Aca iria la cantidad de maquinas alquiladas</p>
       <label for="slcFiltroStockInstancias">
         Seleccione un tipo de instancia
