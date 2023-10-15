@@ -5,31 +5,32 @@ class Sistema {
     this.usuarios = [];
   }
 
-  crearUsuario(nombre, apellido, usuario, contrasenia, repeticionContrasenia)
-  {
-    if(!this.esNombreUsuarioValido(usuario)) return false;
-    if(!this.esContraseniaValida(contrasenia, repeticionContrasenia)) return false;
+  crearUsuario(nombre, apellido, nombreUsuario, contrasenia)
+  { 
+    let usuario = new Usuario(nombre, apellido, nombreUsuario, contrasenia);
+    this.usuarios.push(usuario);
+    return true;
   }
   
   esNombreUsuarioValido(usuario) {
     if (this.existeNombreUsuario(usuario)) return false;
-    if (nombre.length < 4 || nombre.length > 20 || Number(usuario)) {
+    if (usuario.length < 4 || usuario.length > 20 || Number(usuario)) {
       return false;
     }
     return true;
   }
 
-  existeNombreUsuario(nombre) {
+  existeNombreUsuario(usuario) {
     let existe = false;
     let i = 0;
     while (i < this.usuarios.length && !existe) {
-      existe = usuarios[i].nombreUsuario === nombre;
+      existe = this.usuarios[i].nombreUsuario === usuario;
       i++;
     }
     return existe;
   }
 
-  esContraseniaValida(contrasenia, repetirContrasenia) {
+  esContraseniaValida(contrasenia) {
     if (contrasenia.length < 5) return false;
     let tieneMayuscula = false;
     let tieneMinuscula = false;
@@ -38,10 +39,24 @@ class Sistema {
     while(i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)) {
       tieneMayuscula = contrasenia.charCodeAt(i) > 64 && contrasenia.charCodeAt(i) < 91 ? true : tieneMayuscula;
       tieneMinuscula = contrasenia.charCodeAt(i) > 96 && contrasenia.charCodeAt(i) < 123 ? true : tieneMinuscula;
-      tieneNumero = Number(contrasenia.charAt[i]) ? true : tieneNumero;
+      tieneNumero = Number(contrasenia.charAt(i)) ? true : tieneNumero;
       i++;
     }
     return tieneMayuscula && tieneMinuscula && tieneNumero;
+  }
+
+  contraseniasCoinciden(contrasenia, repetirContrasenia)
+  {
+    return contrasenia === repetirContrasenia;
+  }
+
+  esTarjetaDeCreditoValida(nroTarjeta, cvc)
+  {
+    if(!nroTarjeta.length || !cvc.length)
+    {
+      return false;
+    }
+    return true;  //TODO
   }
 }
 
@@ -53,6 +68,7 @@ class Usuario {
     this.apellido = apellido;
     this.nombreUsuario = nombreUsuario;
     this.contrasenia = contrasenia;
+    this.instancias = [];
   }
 }
 
