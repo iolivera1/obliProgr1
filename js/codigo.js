@@ -42,7 +42,13 @@ function crearUsuario()
   let nroTarjetaCredito = document.querySelector("#txtTarjetaCreditoNumero").value;
   let cvc = document.querySelector("#txtCVC").value;
 
-  if(!datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia)) return;
+  let msjError = validacionDeRegistro(nombre, apellido, userName, contrasenia, repeticionContrasenia)
+  if(msjError.length > 0)
+  {
+    document.querySelector("#pMsjErrorRegistroUsuario").innerHTML = msjError;
+    return;
+  }
+  document.querySelector("#pMsjErrorRegistroUsuario").innerHTML =``;
   document.querySelector("#divRegistroFormaDePago").style.display = "block";
   if(!formaDePagoEsValida(nroTarjetaCredito, cvc)) return;
 
@@ -51,7 +57,7 @@ function crearUsuario()
 }
 
 
-function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia)
+function validacionDeRegistro(nombre, apellido, userName, contrasenia, repeticionContrasenia)
 {
 
   let msjError = ``;
@@ -73,13 +79,7 @@ function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repe
     msjError = `${DENIED_ICON} Las contrasenias no coinciden <br>`;
   }
 
-  if(msjError.length > 0)
-  {
-    document.querySelector("#pMsjErrorRegistroUsuario").innerHTML = msjError;
-    return false;
-  }
-  
-  return true;
+  return msjError;
 }
 
 
