@@ -1,126 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OBLIGATORIO - OLIVERA y OLIVERI</title>
-</head>
-<body style="text-align: center;">
-    <div style="text-align: center;">
-        <h1 style="font-family: cursive;">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
-    </div>
-    
-    <div class="InteraccionUsuarioComun" id="divRegistroUsuarioNuevo">
-
-        <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
-        <div id="divRegistroCredenciales">
-            <label for="txtNombreRegisto">Nombre:</label>
-            <input type="text" id="txtNombreRegisto">
-            <br>
-            <label for="txtApellidoRegisto">Apellido:</label>
-            <input type="text" id="txtApellidoRegisto">
-            <br>
-            <label for="txtUsernameRegistro">Nombre de usuario:</label>
-            <input type="text" id="txtUsernameRegistro">
-            <br>
-            <label for="txtContraseniaRegistro">Contraseña:</label>
-            <input type="text" id="txtContraseniaRegistro">
-            <br>
-            <label for="txtContraseniaRepeticionRegistro">Repita la contraseña:</label>
-            <input type="text" id="txtContraseniaRepeticionRegistro">
-            <br>
-        </div>
-        <div id="divRegistroFormaDePago">     
-            <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
-            <input type="text" id="txtTarjetaCreditoNumero">
-            <br>
-            <label for="txtApellidoRegisto">CVC:</label>
-            <input type="text" id="txtTarjetaCreditoCVC">
-        </div>
-
-        <button id="btnIrALoginUsuario">Ya tengo usuario</button>
+  </head>
+  <body style="text-align: center">
+    <div style="text-align: center">
+      <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
     </div>
 
-    <div id="divLoginUsuario">
-        <h3>Por favor, realiza el Login</h3>
-        <label for="txtNombreUsuarioLogin">Nombre de usuario: </label>
-        <input type="text" id="txtUsernameoLogin">
-        <br>
-        <label for="txtContraseniaLogin">Contraseña: </label>
-        <input type="text" id="txtContraseniaLogin">
-        <br>
-        <br>
-        <button id="btnLogin">Login</button>
+    <div class="seccionPagina" id="divLoginUsuario" style="display: none">
+      <h3>Por favor, realiza el Login</h3>
+      <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
+      <input type="text" id="txtUsernameoLogin" />
+      <br />
+      <label for="txtContraseniaLogin">Contraseña:</label>
+      <input type="text" id="txtContraseniaLogin" />
+      <br />
+      <br />
+      <button id="btnLogin">Login</button>
+      <button
+        class="btnNavegacion"
+        id="btnEnviarLoginUsuario"
+        data-mostrar="divRegistroUsuarioNuevo"
+      >
+        Crear Usuario
+      </button>
     </div>
 
-    <div class="InteraccionUsuarioComun" id="divAlquilerDeInstancias">
-        <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
-        <label for="slcTipoInstanciaSeleccionada">Seleccione un tipo de VM</label>
-        <select id="slcTipoInstanciaSeleccionada">
-            <option value="-1">Seleccione una opcion</option>
+    <div
+      class="seccionPagina"
+      id="divRegistroUsuarioNuevo"
+      style="display: none"
+    >
+      <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
+      <div class="seccionRegistro" id="divRegistroCredenciales">
+        <label for="txtNombreRegisto">Nombre:</label>
+        <input type="text" id="txtNombreRegisto" />
+        <br />
+        <label for="txtApellidoRegisto">Apellido:</label>
+        <input type="text" id="txtApellidoRegisto" />
+        <br />
+        <label for="txtUsernameRegistro">Nombre de usuario:</label>
+        <input type="text" id="txtUsernameRegistro" />
+        <br />
+        <label for="txtContraseniaRegistro">Contraseña:</label>
+        <input type="password" id="txtContraseniaRegistro" />
+        <br />
+        <label for="txtContraseniaRepeticionRegistro">
+          Repita la contraseña:
+        </label>
+        <input type="password" id="txtContraseniaRepeticionRegistro" />
+        <br />
+        <p id="pMsjErrorRegistroUsuario"></p>
+      </div>
+
+      <div
+        class="seccionRegistro"
+        id="divRegistroFormaDePago"
+        style="display: none"
+      >
+        <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
+        <input type="text" id="txtTarjetaCreditoNumero" />
+        <br />
+        <label for="txtCVC">CVC:</label>
+        <input type="text" id="txtCVC" />
+        <p id="pMsjErrorFormaPago"></p>
+      </div>
+      <button id="btnCrearUsuario">Enviar</button>
+      <button
+        class="btnNavegacion"
+        id="btnYaTengoUsuario"
+        data-mostrar="divLoginUsuario"
+      >
+        Ya tengo usuario
+      </button>
+    </div>
+
+    <div
+      class="seccionPagina"
+      id="divAlquilerDeInstancias"
+      style="display: block"
+    >
+      <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
+      <label for="slcTipoInstanciaSeleccionada">
+        Seleccione un tipo de instancia
+      </label>
+      <select id="slcTipoInstanciaSeleccionada">
+        <option value="-1">Seleccione una opcion</option>
+        <option value="0">Optimizada para cómputo</option>
+        <option value="1">Optimizada para memoria</option>
+        <option value="2">Optimizada para almacenamiento</option>
+      </select>
+      <br />
+      <div id="divTipoDeInstanciaC" style="display: none;">
+        <label for="slcTipoInstanciaC">Seleccione una instancia</label>
+        <select id="slcTipoInstanciaC">
+          <option value="-1">Seleccione una opción</option>
         </select>
-        <br>
+        <br />
         <button id="btnAlquilarVM">Alquilar instancia</button>
+      </div>
+
+      <br />
+      <p id="pErrorAlquiler"></p>
     </div>
 
-    <div  class="InteraccionUsuarioComun" id="divListadoDeInstancias">
-
-        <h3>Visualizacion de instancias alquiladas</h3>
-        <select id="slcFiltroTablaInstancias">
-            <option value="-1">Todas las instancias</option>
-        </select>
-        <table border="8" id="tableListadoDeInstancias">
-            <thead>
-                <tr>
-                    <th>Tipo de instancia</th>
-                    <th>Estado</th>
-                    <th>Veces iniciada</th>
-                    <th>Apagar/Encender</th>
-                </tr>
-            </thead>
+    <div
+      class="seccionPagina"
+      id="divListadoDeInstancias"
+      style="display: none"
+    >
+      <h3>Visualizacion de instancias alquiladas</h3>
+      <select id="slcFiltroTablaInstancias">
+        <option value="-1">Todas las instancias</option>
+      </select>
+      <br />
+      <br />
+      <div style="display: flex; justify-content: center">
+        <table border="4" id="tableListadoDeInstancias">
+          <thead>
+            <tr>
+              <th>Tipo de instancia</th>
+              <th>Estado</th>
+              <th>Veces iniciada</th>
+              <th>Apagar/Encender</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>c7.small</th>
+              <th>Activa</th>
+              <th>1</th>
+              <th><button>Apagar</button></th>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
 
-    <div class="InteraccionUsuarioComun" id="divTotalesAPagar">
-        <h3>Visualizacion de costos acumulados</h3>
-        <table border="8" id="tableCostosAcumulados">
-            <thead>
-                <tr>
-                    <th>Tipo de instancia</th>
-                    <th>Costo por encendido</th>
-                    <th>Total de veces encendidas</th>
-                    <th>Costo total</th>
-                </tr>
-            </thead>
+    <div class="seccionPagina" id="divTotalesAPagar" style="display: none">
+      <h3>Visualizacion de costos acumulados</h3>
+      <table border="4" id="tableCostosAcumulados">
+        <thead>
+          <tr>
+            <th>Tipo de instancia</th>
+            <th>Costo por encendido</th>
+            <th>Total de veces encendidas</th>
+            <th>Costo total</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="seccionPagina" id="divListadoUsuarios" style="display: none">
+      <h3>Aprobacion de Usuarios</h3>
+      <div style="display: flex; justify-content: center">
+        <table border="4" id="tableListadoUsuarios">
+          <thead>
+            <tr>
+              <th>Nombre de usuario</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Raul Fernandez</th>
+              <th>Inactivo</th>
+              <th><button>Activar</button></th>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
 
-    <div class="InteraccionUsuarioAdmin" id="divListadoUsuarios">
-        <h3>Visualizacion de Usuarios</h3>
-        <table border="8" id="tableListadoUsuarios">
-            <thead>
-                <tr>
-                    <th>Nombre de usuario</th>
-                    <th>Estado</th>
-                    <th>Activar</th>
-                    <th>Bloqueo</th>
-                </tr>
-            </thead>
+    <div class="seccionPagina" id="divStockInstancias" style="display: none">
+      <h3>Visualizacion de Instancias Alquiladas</h3>
+      <label for="slcFiltroStockInstancias">
+        Seleccione un tipo de instancia
+      </label>
+      <br />
+
+      <select id="slcFiltroStockInstancias">
+        <option value="-1">Seleccione una opcion</option>
+        <option value="0">Optimizada para cómputo</option>
+        <option value="1">Optimizada para memoria</option>
+        <option value="2">Optimizada para almacenamiento</option>
+      </select>
+      <br />
+      <br />
+
+      <label for="txtNuevoStockIngresado">
+        Ingrese un nuevo Stock para el tipo seleccionado:
+      </label>
+      <br />
+      <input
+        type="text"
+        id="txtNuevoStockIngresado"
+        placeholder="Nuevo stock..."
+      />
+      <br />
+      <br />
+
+      <button id="btnEnviarNuevoStock">Actualizar</button>
+    </div>
+
+    <div class="seccionPagina" id="divInformeInstancias" style="display: none">
+      <h3>Visualizacion de Instancias Alquiladas</h3>
+      <div style="display: flex; justify-content: center">
+        <table border="4" id="tableListadoInstancias">
+          <thead>
+            <tr>
+              <th>Tipo de instancia</th>
+              <th>Veces incializada</th>
+              <th>Estado</th>
+              <th>Costo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>c7.small</th>
+              <th>1</th>
+              <th>activa</th>
+              <th>$22.50</th>
+            </tr>
+          </tbody>
         </table>
+      </div>
+      <p id="IngresoTotalInstancias">Ingreso total: $22.50</p>
     </div>
 
-    <div class="InteraccionUsuarioAdmin" id="divStockInstancias">
-
-        <p>Aca iria la cantidad de maquinas alquiladas</p>
-        <label for="slcFiltroStockInstancias">Seleccione un tipo de instancia</label>
-        <br>
-        <select id="slcFiltroStockInstancias">
-            <option value="-1">Seleccione una opcion</option>
-        </select>
-        <label for="txtNuevoStockIngresado">Ingrese un nuevo Stock para el tipo seleccionado:</label>
-        <br>
-        <input type="text" id="txtNuevoStockIngresado" placeholder="Nuevo stock...">
-    </div>
-
-</body>
+    <script src="js/clases.js"></script>
+    <script src="js/codigo.js"></script>
+  </body>
 </html>
+
