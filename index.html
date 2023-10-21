@@ -10,7 +10,7 @@
       <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
     </div>
 
-    <div class="seccionPagina" id="divLoginUsuario" style="display: none">
+    <div class="seccionPagina" id="divLoginUsuario" style="display: block">
       <h3>Por favor, realiza el Login</h3>
       <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
       <input type="text" id="txtUsernameoLogin" />
@@ -81,7 +81,7 @@
     <div
       class="seccionPagina"
       id="divAlquilerDeInstancias"
-      style="display: block"
+      style="display: none"
     >
       <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
       <label for="slcTipoInstanciaSeleccionada">
@@ -94,12 +94,13 @@
         <option value="2">Optimizada para almacenamiento</option>
       </select>
       <br />
+      <br>
       <div id="divTipoDeInstanciaC" style="display: none;">
         <label for="slcTipoInstanciaC">Seleccione una instancia</label>
         <select id="slcTipoInstanciaC">
-          <option value="-1">Seleccione una opción</option>
         </select>
         <br />
+        <br>
         <button id="btnAlquilarVM">Alquilar instancia</button>
       </div>
 
