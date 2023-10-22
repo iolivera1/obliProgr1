@@ -39,7 +39,7 @@ document.querySelector("#btnLogOut").addEventListener('click', logout)
 //fin eventos fijos
 
 habilitarNavegacion();
-mostrarPagina("#divLoginUsuario");
+mostrarPagina("#divRegistroUsuarioNuevo");
 
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
@@ -75,7 +75,7 @@ function mostrarPagina(id) {
 }
 
 /**
- * Validacion del registro de usuario, chequea nombre de usuario, contrasenia
+ * Validacion del registro de usuario, chequea nombre de usuario, contrasenia y forma de pago
  */
 function crearUsuario() {
   let nombre = document.querySelector("#txtNombreRegisto").value;
@@ -119,6 +119,10 @@ function datosDeRegistroSonValidos(
   if (!nombre.length || !apellido.length) {
     msjError += `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
   }
+  if(sistema.existeNombreDeUsuario(userName))
+  {
+    msjError += `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
+  }
   if (!sistema.esNombreUsuarioValido(userName)) {
     msjError += `${DENIED_ICON} El nombre de usuario debe tener entre 4 y 20 caracteres. No puede ser un numero <br>`;
   }
@@ -130,7 +134,7 @@ function datosDeRegistroSonValidos(
     msjError = `${DENIED_ICON} Las contrasenias no coinciden <br>`;
   }
 
-  document.querySelector("#pMsjErrorRegistroUsuario").innerHTML = msjError;
+  document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
   
   if (msjError.length > 0) {
     return false;
@@ -146,12 +150,14 @@ function datosDeRegistroSonValidos(
  * @returns  true 
  */
 function formaDePagoEsValida(nroTarjetaCredito, cvc) {
+  if(!nroTarjetaCredito || !cvc) return false;
+  
   let msjError = ``;
   if (!sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc)) {
     msjError = `${WARNING_ICON} La forma de pago ingresada no es valida`;
   }
 
-  document.querySelector("#pMsjErrorFormaPago").innerHTML = msjError;
+  document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
   
   if (msjError.length > 0) {
     return false;

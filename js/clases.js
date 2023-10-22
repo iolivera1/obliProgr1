@@ -8,7 +8,7 @@ class Sistema {
   }
 
   /** En este punto todas las validaciones se tienen que haber realizado
-   *  Agrega un usaurio al array de usuarios
+   *  Agrega un usuario al array de usuarios
    * 
    * @param {String} nombre 
    * @param {String} apellido 
@@ -44,17 +44,21 @@ class Sistema {
     this.usuarioActual = null;
   }
 
-  /**Un nombre de usuario es valido si tiene al menos 4 
+  /**Un nombre de usuario es valido si tiene al menos 4 caracteres y no mas de 20 
    * 
    * @param {String} nombreUsuario 
    * @returns true si el usuario es valido, false en otro caso
    */
   esNombreUsuarioValido(nombreUsuario) {
-    if (!this.encontrarUsuario(nombreUsuario)) return false;
     if (nombreUsuario.length < 4 || nombreUsuario.length > 20 || Number(nombreUsuario)) {
       return false;
     }
     return true;
+  }
+
+  existeNombreDeUsuario(nombreUsuario)
+  {
+    return (this.encontrarUsuario(nombreUsuario) !== null);
   }
 
   /**Busca un usuario por su nombre de usuario
@@ -114,17 +118,18 @@ class Sistema {
    * @param {Number} cvc 
    * @returns true si la tarjeta ingresada es valida, false en otro caso
    */
-  esTarjetaDeCreditoValida(nroTarjeta, cvc) {
-    
-    return true; //TODO
-    if (nroTarjeta.length !== 16 || cvc.length !== 3 ) {
-      return false;
-    } 
+  esTarjetaDeCreditoValida(nroTarjeta, cvc) 
+  {
+    const LARGO_TARJETA = 16;
+    if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3 ) return false;
     let tarjetaConDuplicado = this.tarjetaConDuplicado(nroTarjeta);
-    sumarMayoresQueNueve(tarjetaConDuplicado);
+    let resultado = 0;
+    for(let i = 0; i < LARGO_TARJETA; i++)
+    {
+      resultado += this.sumarMayoresQueNueve(tarjetaConDuplicado[i]);
+    }
 
-
-    return true; 
+    return (resultado*9 % 10) === nroTarjeta[nroTarjeta.length - 1];
   }
 
   tarjetaConDuplicado(nroTarjeta)
@@ -132,30 +137,36 @@ class Sistema {
     let resultado = [];
     for(let i = nroTarjeta.length - 2; i >= 0; i--)
     {
-      resultado.push( nroTarjeta.charAt(i) % 2 === 0 ? nroTarjeta.charAt(i)*2 : nroTarjeta.charAt(i));
+      let numero = Number(nroTarjeta.charAt(i));
+      resultado.push((numero % 2 === 0) ? numero*2 : numero);
     }
     return resultado;
   }
 
-  sumarMayoresQueNueve()
+  sumarMayoresQueNueve(numero)
   {
-
+    if(numero > 9)
+    {
+      return 1 + numero % 10;
+    }
+    return numero;
   }
 
   preCargarDatos()
   {
-    this.usuarios.push(new Usuario("Martino", "Oliveri", "admin", "admin", true))
+    this.usuarios.push(new Usuario("Martino", "Oliveri", "admin", "admin", true));
+    this.usuarios[0].esAdmin = true;
   }
 }
 
 class Usuario {
-  constructor(nombre, apellido, nombreUsuario, contrasenia, esAdmin) {
+  constructor(nombre, apellido, nombreUsuario, contrasenia) {
     this.id = idUsuario++;
     this.nombre = nombre;
     this.apellido = apellido;
     this.nombreUsuario = nombreUsuario;
     this.contrasenia = contrasenia;
-    this.instancias = esAdmin ? [] : null;
-    this.esAdmin = esAdmin;
+    this.instancias = [];
+    this.esAdmin = false;
   }
 }
