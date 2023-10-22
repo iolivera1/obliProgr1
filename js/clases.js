@@ -1,8 +1,10 @@
 let idUsuario = 0;
+let idInstancia = 0;
+class Sistema 
+{
 
-class Sistema {
-
-  constructor() {
+  constructor() 
+  {
     this.usuarios = [];
     this.usuarioActual = null;
   }
@@ -15,7 +17,8 @@ class Sistema {
    * @param {String} nombreUsuario 
    * @param {String} contrasenia 
    */
-  crearUsuario(nombre, apellido, nombreUsuario, contrasenia) {
+  crearUsuario(nombre, apellido, nombreUsuario, contrasenia) 
+  {
     let usuario = new Usuario(nombre, apellido, nombreUsuario, contrasenia);
     this.usuarios.push(usuario);
   }
@@ -49,8 +52,10 @@ class Sistema {
    * @param {String} nombreUsuario 
    * @returns true si el usuario es valido, false en otro caso
    */
-  esNombreUsuarioValido(nombreUsuario) {
-    if (nombreUsuario.length < 4 || nombreUsuario.length > 20 || Number(nombreUsuario)) {
+  esNombreUsuarioValido(nombreUsuario) 
+  {
+    if (nombreUsuario.length < 4 || nombreUsuario.length > 20 || Number(nombreUsuario)) 
+    {
       return false;
     }
     return true;
@@ -66,10 +71,12 @@ class Sistema {
    * @param {String} nombreUsuario 
    * @returns {Usuario} un objeto de la clase Usuarios, si lo encuentra en usuarios[]; null en otro caso 
    */
-  encontrarUsuario(nombreUsuario) {
+  encontrarUsuario(nombreUsuario) 
+  {
     let usuario = null;
     let i = 0;
-    while (i < this.usuarios.length && !usuario) {
+    while (i < this.usuarios.length && !usuario) 
+    {
       usuario = this.usuarios[i].nombreUsuario === nombreUsuario ? this.usuarios[i] : null;
       i++;
     }
@@ -81,14 +88,15 @@ class Sistema {
    * @param {String} contrasenia 
    * @returns true si la contrasenia ingresada es valida para asociar a un usuario, false en otro caso 
    */
-  esContraseniaValida(contrasenia) {
+  esContraseniaValida(contrasenia) 
+  {
     if (contrasenia.length < 5) return false;
     let tieneMayuscula = false;
     let tieneMinuscula = false;
     let tieneNumero = false;
     let i = 0;
-    while (i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)
-    ) {
+    while (i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)) 
+    {
       tieneMayuscula =
         contrasenia.charCodeAt(i) > 64 && contrasenia.charCodeAt(i) < 91
           ? true
@@ -108,12 +116,13 @@ class Sistema {
    * @param {String} contrasenia 
    * @param {String} contraseniaRepeticion 
    */
-  contraseniasCoinciden(contrasenia, contraseniaRepeticion) {
+  contraseniasCoinciden(contrasenia, contraseniaRepeticion) 
+  {
     return contrasenia === contraseniaRepeticion;
   }
 
-  /** Valida tarjeta de credito usando el algoritmo de Luhn
-   * 
+  /** Valida tarjeta de credito usando el algoritmo de Luhn;
+   *  no funciona todavia jeje
    * @param {string} nroTarjeta 
    * @param {Number} cvc 
    * @returns true si la tarjeta ingresada es valida, false en otro caso
@@ -129,7 +138,7 @@ class Sistema {
       resultado += this.sumarMayoresQueNueve(tarjetaConDuplicado[i]);
     }
 
-    return (resultado*9 % 10) === nroTarjeta[nroTarjeta.length - 1];
+    return (resultado*9 % 10) === nroTarjeta % 10;
   }
 
   tarjetaConDuplicado(nroTarjeta)
@@ -159,8 +168,10 @@ class Sistema {
   }
 }
 
-class Usuario {
-  constructor(nombre, apellido, nombreUsuario, contrasenia) {
+class Usuario 
+{
+  constructor(nombre, apellido, nombreUsuario, contrasenia) 
+  {
     this.id = idUsuario++;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -168,5 +179,15 @@ class Usuario {
     this.contrasenia = contrasenia;
     this.instancias = [];
     this.esAdmin = false;
+  }
+}
+
+class Instancia
+{
+  constructor()
+  {
+    this.id = idInstancia++;
+    this.encendida = true;
+    
   }
 }

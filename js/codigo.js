@@ -31,8 +31,9 @@ document
   .querySelector("#slcTipoInstanciaSeleccionada")
   .addEventListener("change", montarOpcionesInstancias);
 
-document.querySelector("#btnLogin").addEventListener('click', login)
-document.querySelector("#btnLogOut").addEventListener('click', logout)
+document.querySelector("#btnLogin").addEventListener('click', login);
+document.querySelector("#btnLogOut").addEventListener('click', logout);
+document.querySelector("#btnAlquilarVM").addEventListener('click', alquilarMaquinaVirtual);
 
 
 
@@ -187,6 +188,11 @@ function montarOpcionesInstancias() {
     cargarSelect(select, opcionSelect);
     divSelect.style.display = "block";
   }
+}
+
+function alquilarMaquinaVirtual()
+{
+  
 }
 
 function cargarSelect(select, valor) {
