@@ -10,7 +10,12 @@
       <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
     </div>
 
-    <div class="seccionPagina" id="divLoginUsuario" style="display: block">
+    <!--Login usuario-->
+    <div 
+      class="seccionPagina" 
+      id="divLoginUsuario" 
+      style="display: block"
+    >
       <h3>Por favor, realiza el Login</h3>
       <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
       <input type="text" id="txtUsernameoLogin" />
@@ -27,14 +32,19 @@
       >
         Crear Usuario
       </button>
+      <br>
+      <p id="pErrorLogin"></p>
     </div>
+    <!--Fin login usuario-->
 
+    <!--Registro de usuario-->
     <div
       class="seccionPagina"
       id="divRegistroUsuarioNuevo"
       style="display: none"
     >
       <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
+      <!-- Subseccion del registro: ingreso de credenciales-->
       <div class="seccionRegistro" id="divRegistroCredenciales">
         <label for="txtNombreRegisto">Nombre:</label>
         <input type="text" id="txtNombreRegisto" />
@@ -53,9 +63,11 @@
         </label>
         <input type="password" id="txtContraseniaRepeticionRegistro" />
         <br />
-        <p id="pMsjErrorRegistroUsuario"></p>
       </div>
+      <!-- Fin de ingreso de credenciales-->
 
+
+      <!-- Subseccion del registro: Forma de pago-->
       <div
         class="seccionRegistro"
         id="divRegistroFormaDePago"
@@ -66,8 +78,9 @@
         <br />
         <label for="txtCVC">CVC:</label>
         <input type="text" id="txtCVC" />
-        <p id="pMsjErrorFormaPago"></p>
       </div>
+      <!-- Fin de forma de pago-->
+
       <button id="btnCrearUsuario">Enviar</button>
       <button
         class="btnNavegacion"
@@ -76,8 +89,12 @@
       >
         Ya tengo usuario
       </button>
+      
+      <p id="pMsjRegistroUsuario"></p>
     </div>
+    <!--Fin registro de usuario-->
 
+    <!--Seccion de alquiler de una instancia-->
     <div
       class="seccionPagina"
       id="divAlquilerDeInstancias"
@@ -95,9 +112,9 @@
       </select>
       <br />
       <br>
-      <div id="divTipoDeInstanciaC" style="display: none;">
-        <label for="slcTipoInstanciaC">Seleccione una instancia</label>
-        <select id="slcTipoInstanciaC">
+      <div id="divTipoDeInstancia" style="display: none;">
+        <label for="slcTipoInstancia">Seleccione una instancia</label>
+        <select id="slcTipoInstancia">
         </select>
         <br />
         <br>
@@ -106,8 +123,13 @@
 
       <br />
       <p id="pErrorAlquiler"></p>
-    </div>
 
+
+      <button id="btnLogOut">Log out</button>
+    </div>
+    <!--Fin seccion de alquiler de una instancia-->
+
+    <!--Seccion de listado de instancias alquiladas-->
     <div
       class="seccionPagina"
       id="divListadoDeInstancias"
@@ -140,8 +162,16 @@
         </table>
       </div>
     </div>
+    <!--Fin de seccion de listado de instancias alquiladas-->
+    
 
-    <div class="seccionPagina" id="divTotalesAPagar" style="display: none">
+
+    <!--Seccion de totales a pagar por cada instancia-->
+    <div 
+      class="seccionPagina" 
+      id="divTotalesAPagar" 
+      style="display: none"
+    >
       <h3>Visualizacion de costos acumulados</h3>
       <table border="4" id="tableCostosAcumulados">
         <thead>
@@ -154,7 +184,10 @@
         </thead>
       </table>
     </div>
+    <!--Fin de seccion de totales a pagar por cada instancia-->
 
+
+    <!--ADMIN ONLY Listado de usuarios-->
     <div class="seccionPagina" id="divListadoUsuarios" style="display: none">
       <h3>Aprobacion de Usuarios</h3>
       <div style="display: flex; justify-content: center">
@@ -176,7 +209,10 @@
         </table>
       </div>
     </div>
+    <!--Fin de Listado de usuarios-->
 
+
+    <!--ADMIN ONLY Actualizacion de stock de instancias-->
     <div class="seccionPagina" id="divStockInstancias" style="display: none">
       <h3>Visualizacion de Instancias Alquiladas</h3>
       <label for="slcFiltroStockInstancias">
@@ -207,7 +243,10 @@
 
       <button id="btnEnviarNuevoStock">Actualizar</button>
     </div>
+    <!--ADMIN ONLY Actualizacion de stock de instancias-->
 
+
+    <!--ADMIN ONLY Tabla de informe de instancias-->
     <div class="seccionPagina" id="divInformeInstancias" style="display: none">
       <h3>Visualizacion de Instancias Alquiladas</h3>
       <div style="display: flex; justify-content: center">
@@ -232,6 +271,9 @@
       </div>
       <p id="IngresoTotalInstancias">Ingreso total: $22.50</p>
     </div>
+    <!--Fin de tabla de informe de instancias-->
+    
+
 
     <script src="js/clases.js"></script>
     <script src="js/codigo.js"></script>
