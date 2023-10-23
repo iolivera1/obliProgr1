@@ -161,15 +161,27 @@ class Sistema
     return numero;
   }
 
+  otorgarInstanciaAUsuario(usuario, precioPorEncendido, precioPorAlquiler)
+  {
+    usuario.instancias.push(new Instancia(precioPorEncendido, precioPorAlquiler));
+  }
+
   preCargarDatos()
   {
-    this.usuarios.push(new Usuario("Martino", "Oliveri", "admin", "admin", true));
+    this.usuarios.push(new Usuario("Martino", "Oliveri", "admin", "admin"));
     this.usuarios[0].esAdmin = true;
   }
 }
 
 class Usuario 
 {
+  /**Un usuario es unico (ID) y puede alquilar instancias, por default no son admin
+   * 
+   * @param {String} nombre 
+   * @param {String} apellido 
+   * @param {String} nombreUsuario 
+   * @param {String} contrasenia 
+   */
   constructor(nombre, apellido, nombreUsuario, contrasenia) 
   {
     this.id = idUsuario++;
@@ -184,10 +196,16 @@ class Usuario
 
 class Instancia
 {
-  constructor()
+  /**
+   * 
+   * @param {Number} precioPorEncendido 
+   * @param {Number} precioPorAlquiler 
+   */
+  constructor(codigoTipo, codigoOpcion, precioPorEncendido, precioPorAlquiler)
   {
     this.id = idInstancia++;
     this.encendida = true;
-    
+    this.precioPorEncendido = precioPorEncendido;
+    this.precioPorAlquiler = precioPorAlquiler;
   }
 }

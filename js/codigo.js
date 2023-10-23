@@ -148,7 +148,7 @@ function datosDeRegistroSonValidos(
  * 
  * @param {Number} nroTarjetaCredito 
  * @param {Number} cvc 
- * @returns  true 
+ * @returns  true si la tarjeta es valida (segun algoritmo de Luhn)
  */
 function formaDePagoEsValida(nroTarjetaCredito, cvc) {
   if(!nroTarjetaCredito || !cvc) return false;
@@ -167,7 +167,6 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
   return true;
 }
 
-
 /**
  * En la seccion alquiler, carga el segundo combo box dinamicamente usando el value del primer combo box
  */
@@ -176,7 +175,7 @@ function montarOpcionesInstancias() {
     document.querySelector("#slcTipoInstanciaSeleccionada").value
   );
   let divSelect = document.querySelector("#divTipoDeInstancia");
-  let select = document.querySelector("#slcTipoInstancia");
+  let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
 
   if (opcionSelect == -1) {
@@ -185,33 +184,45 @@ function montarOpcionesInstancias() {
     ).innerHTML = `${DENIED_ICON} Seleccione una opción`;
     divSelect.style.display = "none";
   } else {
-    cargarSelect(select, opcionSelect);
+    cargarSelect(selectCarga, opcionSelect);
     divSelect.style.display = "block";
   }
 }
 
-function alquilarMaquinaVirtual()
-{
-  
-}
-
-function cargarSelect(select, valor) {
-  let opciones = TIPOS_INSTANCIA[valor];
+function cargarSelect(select, indice) {
+  let opciones = TIPOS_INSTANCIA[indice];
   while (select.options.length > 0) {
     select.remove(0);
   }
 
   let option = document.createElement("option");
   option.value = -1;
-  option.text = 'seleccione una opcion'
+  option.text = 'Seleccione una opcion'
   select.add(option);
 
   for (i = 0; i < opciones.length; i++) {
     option = document.createElement("option");
-    option.value = `opcion${i}`;
+    option.value = opciones[i];
     option.text = opciones[i];
     select.add(option);
   }
+}
+
+
+function alquilarMaquinaVirtual()
+{
+  let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
+  if(opcionSelecionada === -1) return;
+
+  //aqui pondria mi validacion de stock, si tuviera una!
+
+  
+
+
+
+
+
+  
 }
 
 /**
