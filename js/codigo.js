@@ -1,23 +1,29 @@
 const WARNING_ICON = `<img src="img/warning.webp" height="20px" alt="Advertencia">`;
 const DENIED_ICON = `<img src="img/error.webp" height="20px" alt="Denegado">`;
 const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado">`;
+const TEXTO_ALQUILER = ` - Costo por alquiler: U$S`;
+const TEXTO_ENCENDIDO = ` - costo de encendido: U$S`;
 const TIPOS_INSTANCIA = [
   [
-    "c7.small (costo por alquiler: U$S 20 - costo por encendido: USD 2.50)",
-    "c7.medium (costo por alquiler: U$S 30 - costo por encendido: USD 3.50)",
-    "c7.large (costo por alquiler: U$S 50 - costo por encendido: USD 6.00)",
+    "c7.small", "c7.medium", "c7.large"
   ],
   [
-    "r7.small (costo por alquiler: U$S 35 - costo por encendido: USD 4.00)",
-    "r7.medium (costo por alquiler: U$S 50 - costo por encendido: USD 6.50)",
-    "r7.large (costo por alquiler: U$S 60 - costo por encendido: USD 7.00)",
+    "r7.small", "r7.medium", "r7.large"
   ],
   [
-    "i7.medium (costo por alquiler: U$S 30 - costo por encendido: USD 3.50)",
-    "i7.large (costo por alquiler: U$S 50 - costo por encendido: USD 6.50)",
-  ],
+    "i7.medium", "i7.large"
+  ]
 ];
-
+const PRECIOS_ALQUILER = [
+  [ 20, 30, 50 ],
+  [ 35, 50, 60 ],
+  [ 30, 50]
+];
+const PRECIOS_ENCENDIDO = [
+  [2.50, 3.50, 6.00],
+  [4.00, 6.50, 7.00],
+  [3.50, 6.50]
+]
 let sistema = new Sistema();
 sistema.preCargarDatos();
 
