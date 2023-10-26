@@ -201,7 +201,7 @@ class Instancia
    * @param {Number} precioPorEncendido 
    * @param {Number} precioPorAlquiler 
    */
-  constructor(tipoInstancia, precioPorEncendido, precioPorEncendido)
+  constructor(tipoInstancia, precioPorEncendido, precioPorAlquiler)
   {
     this.id = idInstancia++;
     this.encendida = true;

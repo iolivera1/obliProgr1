@@ -4,26 +4,20 @@ const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado"
 const TEXTO_ALQUILER = ` - Costo por alquiler: U$S`;
 const TEXTO_ENCENDIDO = ` - costo de encendido: U$S`;
 const TIPOS_INSTANCIA = [
-  [
-    "c7.small", "c7.medium", "c7.large"
-  ],
-  [
-    "r7.small", "r7.medium", "r7.large"
-  ],
-  [
-    "i7.medium", "i7.large"
-  ]
+  ["c7.small", "c7.medium", "c7.large"],
+  ["r7.small", "r7.medium", "r7.large"],
+  ["i7.medium", "i7.large"],
 ];
 const PRECIOS_ALQUILER = [
-  [ 20, 30, 50 ],
-  [ 35, 50, 60 ],
-  [ 30, 50]
+  [20, 30, 50],
+  [35, 50, 60],
+  [30, 50],
 ];
 const PRECIOS_ENCENDIDO = [
-  [2.50, 3.50, 6.00],
-  [4.00, 6.50, 7.00],
-  [3.50, 6.50]
-]
+  [2.5, 3.5, 6.0],
+  [4.0, 6.5, 7.0],
+  [3.5, 6.5],
+];
 let sistema = new Sistema();
 sistema.preCargarDatos();
 
@@ -37,11 +31,15 @@ document
   .querySelector("#slcTipoInstanciaSeleccionada")
   .addEventListener("change", montarOpcionesInstancias);
 
-document.querySelector("#btnLogin").addEventListener('click', login);
-document.querySelector("#btnLogOut").addEventListener('click', logout);
-document.querySelector("#btnAlquilarVM").addEventListener('click', alquilarMaquinaVirtual);
+document
+  .querySelector("#slcTipoInstancia")
+  .addEventListener("change", mostrarPrecioInstanciaSeleccionada);
 
-
+document.querySelector("#btnLogin").addEventListener("click", login);
+document.querySelector("#btnLogOut").addEventListener("click", logout);
+document
+  .querySelector("#btnAlquilarVM")
+  .addEventListener("click", alquilarMaquinaVirtual);
 
 //fin eventos fijos
 
@@ -69,8 +67,8 @@ function navegar() {
 }
 
 /** Oculta todos los div de una clase y muestra el ingresado por parametro
- * 
- * @param {String} id 
+ *
+ * @param {String} id
  */
 function mostrarPagina(id) {
   let divsOcultar = document.querySelectorAll(".seccionPagina");
@@ -97,22 +95,33 @@ function crearUsuario() {
   ).value;
   let cvc = document.querySelector("#txtCVC").value;
 
-  if (!datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia)) return;
+  if (
+    !datosDeRegistroSonValidos(
+      nombre,
+      apellido,
+      userName,
+      contrasenia,
+      repeticionContrasenia
+    )
+  )
+    return;
 
   document.querySelector("#divRegistroFormaDePago").style.display = "block";
   if (!formaDePagoEsValida(nroTarjetaCredito, cvc)) return;
 
-  document.querySelector("#pMsjRegistroUsuario").innerHTML = `${APPROVED_ICON} Usuario pendiente de activacion`;
+  document.querySelector(
+    "#pMsjRegistroUsuario"
+  ).innerHTML = `${APPROVED_ICON} Usuario pendiente de activacion`;
   sistema.crearUsuario(nombre, apellido, userName, contrasenia);
 }
 
 /** Muetra mensaje de error por cada dato de registro que no cumpla sus condiciones de ingreso
- * 
- * @param {String} nombre 
- * @param {String} apellido 
- * @param {String} userName 
- * @param {String} contrasenia 
- * @param {String} repeticionContrasenia 
+ *
+ * @param {String} nombre
+ * @param {String} apellido
+ * @param {String} userName
+ * @param {String} contrasenia
+ * @param {String} repeticionContrasenia
  * @returns true si no hay mensajes de error para mostrar; false en otro caso
  */
 function datosDeRegistroSonValidos(
@@ -126,8 +135,7 @@ function datosDeRegistroSonValidos(
   if (!nombre.length || !apellido.length) {
     msjError += `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
   }
-  if(sistema.existeNombreDeUsuario(userName))
-  {
+  if (sistema.existeNombreDeUsuario(userName)) {
     msjError += `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
   }
   if (!sistema.esNombreUsuarioValido(userName)) {
@@ -142,7 +150,7 @@ function datosDeRegistroSonValidos(
   }
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
-  
+
   if (msjError.length > 0) {
     return false;
   }
@@ -151,21 +159,21 @@ function datosDeRegistroSonValidos(
 }
 
 /** Valida forma de pago ingresada en login
- * 
- * @param {Number} nroTarjetaCredito 
- * @param {Number} cvc 
+ *
+ * @param {Number} nroTarjetaCredito
+ * @param {Number} cvc
  * @returns  true si la tarjeta es valida (segun algoritmo de Luhn)
  */
 function formaDePagoEsValida(nroTarjetaCredito, cvc) {
-  if(!nroTarjetaCredito || !cvc) return false;
-  
+  if (!nroTarjetaCredito || !cvc) return false;
+
   let msjError = ``;
   if (!sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc)) {
     msjError = `${WARNING_ICON} La forma de pago ingresada no es valida`;
   }
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
-  
+
   if (msjError.length > 0) {
     return false;
   }
@@ -177,6 +185,7 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
  * En la seccion alquiler, carga el segundo combo box dinamicamente usando el value del primer combo box
  */
 function montarOpcionesInstancias() {
+  document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
   let opcionSelect = Number(
     document.querySelector("#slcTipoInstanciaSeleccionada").value
   );
@@ -203,32 +212,37 @@ function cargarSelect(select, indice) {
 
   let option = document.createElement("option");
   option.value = -1;
-  option.text = 'Seleccione una opcion'
+  option.text = "Seleccione una opcion";
   select.add(option);
 
   for (i = 0; i < opciones.length; i++) {
     option = document.createElement("option");
-    option.value = opciones[i];
+    option.value = i;
     option.text = opciones[i];
     select.add(option);
   }
 }
 
-
-function alquilarMaquinaVirtual()
+/**
+ * Esto es horrible, deberiamos de pensar otra manera
+ */
+function mostrarPrecioInstanciaSeleccionada()
 {
+  let indiceOptimizaciones = Number(document.querySelector("#slcTipoInstanciaSeleccionada").value);
+  let indiceInstancia = document.querySelector("#slcTipoInstancia").value;
+
+  let precioAlquiler = PRECIOS_ALQUILER[indiceOptimizaciones][indiceInstancia];
+  let precioPorEncendido = PRECIOS_ENCENDIDO[indiceOptimizaciones][indiceInstancia];
+
+  let msjPrecio = `Esta instancia tiene un alquiler de <b>U$S${precioAlquiler}</b><br> y un precio por encendido de <b>U$S${precioPorEncendido}</b>`;
+  document.querySelector("#pMsjAlquilerInstancias").innerHTML = msjPrecio;
+}
+
+function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
-  if(opcionSelecionada === -1) return;
+  if (opcionSelecionada === -1) return;
 
   //aqui pondria mi validacion de stock, si tuviera una!
-
-  
-
-
-
-
-
-  
 }
 
 /**
@@ -236,22 +250,19 @@ function alquilarMaquinaVirtual()
  * si logra el login muestra la pantalla de alquiler
  */
 function login() {
-  let usuario = document.querySelector("#txtUsernameoLogin").value
-  let contraseña = document.querySelector("#txtContraseniaLogin").value
+  let usuario = document.querySelector("#txtUsernameoLogin").value;
+  let contraseña = document.querySelector("#txtContraseniaLogin").value;
   document.querySelector("#pErrorLogin").innerHTML = ``;
-  if(sistema.login(usuario, contraseña) === false)
-  {
-    document.querySelector("#pErrorLogin").innerHTML = `${DENIED_ICON} La combinacion de usuario y contrasenha no son correctas`;
-  }
-  else
-  {
+  if (sistema.login(usuario, contraseña) === false) {
+    document.querySelector(
+      "#pErrorLogin"
+    ).innerHTML = `${DENIED_ICON} La combinacion de usuario y contrasenha no son correctas`;
+  } else {
     mostrarPagina("#divAlquilerDeInstancias");
   }
 }
 
-function logout()
-{
+function logout() {
   sistema.logout();
   mostrarPagina("#divLoginUsuario");
-
 }
