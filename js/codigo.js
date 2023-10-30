@@ -44,7 +44,7 @@ document
 //fin eventos fijos
 
 habilitarNavegacion();
-mostrarPagina("#divRegistroUsuarioNuevo");
+mostrarPagina("#divLoginUsuario");
 
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
@@ -186,9 +186,7 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
  */
 function montarOpcionesInstancias() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
-  let opcionSelect = Number(
-    document.querySelector("#slcTipoInstanciaSeleccionada").value
-  );
+  let opcionSelect = Number(document.querySelector("#slcTipoInstanciaSeleccionada").value);
   let divSelect = document.querySelector("#divTipoDeInstancia");
   let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
@@ -204,6 +202,11 @@ function montarOpcionesInstancias() {
   }
 }
 
+/** creo que deberiamos deprecar esta, esta bueno cargar atributos custom a la opcion
+ * 
+ * @param {*} select 
+ * @param {*} indice 
+ 
 function cargarSelect(select, indice) {
   let opciones = TIPOS_INSTANCIA[indice];
   while (select.options.length > 0) {
@@ -222,27 +225,63 @@ function cargarSelect(select, indice) {
     select.add(option);
   }
 }
+*/
+
+/** Carga el segundo select de forma mas rustica, pero agrega atributos custom a las opciones
+ * 
+ * @param {*} select 
+ * @param {*} indice 
+ */
+function cargarSelect(select, indice) {
+  let opciones = TIPOS_INSTANCIA[indice];
+  let preciosAlquiler = PRECIOS_ALQUILER[indice];
+  let preciosEncendido = PRECIOS_ENCENDIDO[indice];
+  while (select.options.length > 0) {
+    select.remove(0);
+  }
+
+  let opcion = `<option value="-1">Seleccione una opcion...</option>`;
+
+  select.innerHTML = opcion;
+
+  for (i = 0; i < opciones.length; i++) {
+    opcion = `<option value="${i}" data-precio_alquiler="${preciosAlquiler[i]}" data-precio_encendido="${preciosEncendido[i]}">${opciones[i]}</option>`;
+    
+    select.innerHTML += opcion;
+  }
+}
 
 /**
- * Esto es horrible, deberiamos de pensar otra manera
+  * Toma los atributos de la opcion seleccionada y los muestra en pantalla
+  * Los atributos son el precio de alquiler y precio de la instancia seleccionada
  */
 function mostrarPrecioInstanciaSeleccionada()
 {
-  let indiceOptimizaciones = Number(document.querySelector("#slcTipoInstanciaSeleccionada").value);
-  let indiceInstancia = document.querySelector("#slcTipoInstancia").value;
+  document.querySelector("#pMsjAlquilerInstancias").innerHTML = ``;
+  let opcionSeleccionada = document.querySelector("#slcTipoInstancia").value;
+  let selectOpciones = document.querySelector("#slcTipoInstancia");
 
-  let precioAlquiler = PRECIOS_ALQUILER[indiceOptimizaciones][indiceInstancia];
-  let precioPorEncendido = PRECIOS_ENCENDIDO[indiceOptimizaciones][indiceInstancia];
+  if(Number(opcionSeleccionada) === -1) 
+  {
+    return;
+  }
 
-  let msjPrecio = `Esta instancia tiene un alquiler de <b>U$S${precioAlquiler}</b><br> y un precio por encendido de <b>U$S${precioPorEncendido}</b>`;
+  let optionElement = selectOpciones.querySelector(`option[value="${opcionSeleccionada}"]`);
+  let alquiler = optionElement.getAttribute("data-precio_alquiler");
+  let encendido = optionElement.getAttribute("data-precio_encendido");
+
+  let msjPrecio = `Esta instancia tiene un alquiler de <b>U$S ${alquiler}</b><br> 
+  y un precio por encendido de <b>U$S ${encendido}</b>`;
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = msjPrecio;
 }
 
 function alquilarMaquinaVirtual() {
-  let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
-  if (opcionSelecionada === -1) return;
+  let opcionSelecionada = document.querySelector("#slcTipoInstancia");
+  if (opcionSelecionada.value === -1) return;
 
   //aqui pondria mi validacion de stock, si tuviera una!
+
+  
 }
 
 /**
