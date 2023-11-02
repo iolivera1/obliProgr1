@@ -36,7 +36,6 @@ document
   .addEventListener("change", mostrarPrecioInstanciaSeleccionada);
 
 document.querySelector("#btnLogin").addEventListener("click", login);
-document.querySelector("#btnLogOut").addEventListener("click", logout);
 document
   .querySelector("#btnAlquilarVM")
   .addEventListener("click", alquilarMaquinaVirtual);
@@ -79,6 +78,14 @@ function mostrarPagina(id) {
   document.querySelector(id).style.display = "block";
 }
 
+function agregarLogOuts() {
+  let botones = document.querySelectorAll(".btnLogOut");
+
+  botones.forEach((boton) => {
+    boton.addEventListener("click", logout);
+  });
+}
+agregarLogOuts();
 /**
  * Validacion del registro de usuario, chequea nombre de usuario, contrasenia y forma de pago
  */
@@ -113,6 +120,9 @@ function crearUsuario() {
     "#pMsjRegistroUsuario"
   ).innerHTML = `${APPROVED_ICON} Usuario pendiente de activacion`;
   sistema.crearUsuario(nombre, apellido, userName, contrasenia);
+
+  let tabla = document.querySelector("#tablaUsuarios");
+  actualizarTablaUsuario(tabla);
 }
 
 /** Muetra mensaje de error por cada dato de registro que no cumpla sus condiciones de ingreso
@@ -186,7 +196,9 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
  */
 function montarOpcionesInstancias() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
-  let opcionSelect = Number(document.querySelector("#slcTipoInstanciaSeleccionada").value);
+  let opcionSelect = Number(
+    document.querySelector("#slcTipoInstanciaSeleccionada").value
+  );
   let divSelect = document.querySelector("#divTipoDeInstancia");
   let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
@@ -202,35 +214,10 @@ function montarOpcionesInstancias() {
   }
 }
 
-/** creo que deberiamos deprecar esta, esta bueno cargar atributos custom a la opcion
- * 
- * @param {*} select 
- * @param {*} indice 
- 
-function cargarSelect(select, indice) {
-  let opciones = TIPOS_INSTANCIA[indice];
-  while (select.options.length > 0) {
-    select.remove(0);
-  }
-
-  let option = document.createElement("option");
-  option.value = -1;
-  option.text = "Seleccione una opcion";
-  select.add(option);
-
-  for (i = 0; i < opciones.length; i++) {
-    option = document.createElement("option");
-    option.value = i;
-    option.text = opciones[i];
-    select.add(option);
-  }
-}
-*/
-
 /** Carga el segundo select de forma mas rustica, pero agrega atributos custom a las opciones
- * 
- * @param {*} select 
- * @param {*} indice 
+ *
+ * @param {*} select
+ * @param {*} indice
  */
 function cargarSelect(select, indice) {
   let opciones = TIPOS_INSTANCIA[indice];
@@ -246,27 +233,27 @@ function cargarSelect(select, indice) {
 
   for (i = 0; i < opciones.length; i++) {
     opcion = `<option value="${i}" data-precio_alquiler="${preciosAlquiler[i]}" data-precio_encendido="${preciosEncendido[i]}">${opciones[i]}</option>`;
-    
+
     select.innerHTML += opcion;
   }
 }
 
 /**
-  * Toma los atributos de la opcion seleccionada y los muestra en pantalla
-  * Los atributos son el precio de alquiler y precio de la instancia seleccionada
+ * Toma los atributos de la opcion seleccionada y los muestra en pantalla
+ * Los atributos son el precio de alquiler y precio de la instancia seleccionada
  */
-function mostrarPrecioInstanciaSeleccionada()
-{
+function mostrarPrecioInstanciaSeleccionada() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = ``;
   let opcionSeleccionada = document.querySelector("#slcTipoInstancia").value;
   let selectOpciones = document.querySelector("#slcTipoInstancia");
 
-  if(Number(opcionSeleccionada) === -1) 
-  {
+  if (Number(opcionSeleccionada) === -1) {
     return;
   }
 
-  let optionElement = selectOpciones.querySelector(`option[value="${opcionSeleccionada}"]`);
+  let optionElement = selectOpciones.querySelector(
+    `option[value="${opcionSeleccionada}"]`
+  );
   let alquiler = optionElement.getAttribute("data-precio_alquiler");
   let encendido = optionElement.getAttribute("data-precio_encendido");
 
@@ -280,8 +267,6 @@ function alquilarMaquinaVirtual() {
   if (opcionSelecionada.value === -1) return;
 
   //aqui pondria mi validacion de stock, si tuviera una!
-
-  
 }
 
 /**
@@ -289,19 +274,69 @@ function alquilarMaquinaVirtual() {
  * si logra el login muestra la pantalla de alquiler
  */
 function login() {
-  let usuario = document.querySelector("#txtUsernameoLogin").value;
-  let contraseña = document.querySelector("#txtContraseniaLogin").value;
+  let usuario = document.querySelector("#txtUsernameoLogin");
+  let contraseña = document.querySelector("#txtContraseniaLogin");
   document.querySelector("#pErrorLogin").innerHTML = ``;
-  if (sistema.login(usuario, contraseña) === false) {
+  if (sistema.login(usuario.value, contraseña.value) === false) {
     document.querySelector(
       "#pErrorLogin"
     ).innerHTML = `${DENIED_ICON} La combinacion de usuario y contrasenha no son correctas`;
   } else {
-    mostrarPagina("#divAlquilerDeInstancias");
+    if (sistema.usuarioActual.esAdmin) {
+      mostrarPagina("#divListadoUsuarios");
+    } else {
+      mostrarPagina("#divAlquilerDeInstancias");
+    }
   }
+  usuario.value = ''
+  contraseña.value = ''
 }
 
 function logout() {
   sistema.logout();
   mostrarPagina("#divLoginUsuario");
 }
+
+function actualizarTablaUsuario() {
+  let tabla = document.querySelector("#tablaUsuarios");
+  let usuarios = sistema.usuarios;
+  let resultado = "";
+  usuarios.forEach((usuario) => {
+    resultado += `<tr><td>${usuario.nombreUsuario}</td><td>${
+      usuario.estado
+    }</td><td>
+    <button class="btnAlternarEstadoUsuario" value="${usuario.id}">${
+      sistema.esUsuarioActivo(usuario) == true ? "deshabilitar" : "habilitar"
+    }</button></td></tr>`;
+  });
+  tabla.innerHTML = resultado;
+  actualizarEventosBotonesTabla();
+}
+
+actualizarTablaUsuario(); // el profe dijo que lo dejemos asi (?
+
+function actualizarEventosBotonesTabla() {
+  let botones = document.querySelectorAll(".btnAlternarEstadoUsuario");
+
+  botones.forEach((boton) => {
+    boton.addEventListener("click", actualizarEstadoUsuario);
+  });
+}
+
+function actualizarEstadoUsuario() {
+  const idUsuario = Number(this.value);
+
+  let usuario = sistema.encontrarUsuarioPorId(idUsuario);
+
+  if (
+    usuario.estado === ESTADO_PENDIENTE ||
+    usuario.estado === ESTADO_BLOQUEADO
+  ) {
+    usuario.estado = ESTADO_ACTIVO;
+  } else {
+    usuario.estado = ESTADO_BLOQUEADO;
+  }
+
+  actualizarTablaUsuario();
+}
+

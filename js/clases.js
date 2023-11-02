@@ -91,6 +91,24 @@ class Sistema {
     return usuario;
   }
 
+  /**Busca un usuario por su nombre de usuario
+   *
+   * @param {Number} idUsuario
+   * @returns {Usuario} un objeto de la clase Usuarios, si lo encuentra en usuarios[]; null en otro caso
+   */
+  encontrarUsuarioPorId(idUsuario) {
+    let usuario = null;
+    let i = 0;
+    while (i < this.usuarios.length && !usuario) {
+      usuario =
+        this.usuarios[i].id === idUsuario
+          ? this.usuarios[i]
+          : null;
+      i++;
+    }
+    return usuario;
+  }
+
   /** validacion de contrasenia ingresada en el registro de usuario
    *
    * @param {String} contrasenia
@@ -139,38 +157,71 @@ class Sistema {
     const LARGO_TARJETA = 16;
     if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3) return false;
     let tarjetaConDuplicado = this.tarjetaConDuplicado(nroTarjeta);
-    let resultado = 0;
-    for (let i = 0; i < LARGO_TARJETA; i++) {
-      resultado += this.sumarMayoresQueNueve(tarjetaConDuplicado[i]);
-    }
+    let sumaDeDigitos = this.tarjetaConDigitosSumados(tarjetaConDuplicado);
 
-    return (resultado * 9) % 10 === nroTarjeta % 10;
+    return (
+      (sumaDeDigitos * 9) % 10 ===
+      Number(nroTarjeta.charAt(nroTarjeta.length - 1))
+    );
   }
 
   tarjetaConDuplicado(nroTarjeta) {
     let resultado = [];
+
     for (let i = nroTarjeta.length - 2; i >= 0; i--) {
-      let numero = Number(nroTarjeta.charAt(i));
-      resultado.push(numero % 2 === 0 ? numero * 2 : numero);
+      let nro = Number(nroTarjeta.charAt(i));
+      if (i % 2 === 0) {
+        resultado.push(nro * 2);
+      } else {
+        resultado.push(nro);
+      }
     }
     return resultado;
   }
 
-  sumarMayoresQueNueve(numero) {
-    if (numero > 9) {
-      return 1 + (numero % 10);
+  /**
+   *
+   * @param {Number} numeros
+   * @returns Retorna la suma de todos los digitos de la tarjeta
+   */
+  tarjetaConDigitosSumados(numeros) {
+    let resultado = 0;
+
+    for (let i = 0; i < numeros.length; i++) {
+      resultado += this.sumarDigitos(numeros[i]);
     }
-    return numero;
+
+    return resultado;
+  }
+
+  sumarDigitos(numero) {
+    if (numero > 9) {
+      return (numero % 10) + 1;
+    } else {
+      return numero;
+    }
   }
 
   otorgarInstanciaAUsuario(usuario, costoPorEncendido, costoPorAlquiler) {
-    //TODO: revisar el new de instancia.
-    usuario.instancias.push(new Instancia(costoPorEncendido, costoPorAlquiler));
+    usuario.instancias.push(
+      new TipoInstancia(costoPorEncendido, costoPorAlquiler)
+    );
   }
 
   preCargarDatos() {
-    this.usuarios.push(new Usuario("Martino", "Oliveri", "admin", "admin"));
-    this.usuarios[0].esAdmin = true;
+    this.usuarios.push(
+      new Usuario(
+        "Admin",
+        "Admin",
+        "admin",
+        "admin",
+        1111111111111111,
+        111,
+        true,
+        []
+      )
+    );
+    this.usuarios[0].estado = ESTADO_ACTIVO;
   }
 
   filtrarTiposDeInstanciasPorOptimizacion(tipo) {
@@ -181,6 +232,14 @@ class Sistema {
       }
     }
     return resultado;
+  }
+
+  esUsuarioActivo(usuario) {
+    if (usuario.estado == ESTADO_ACTIVO) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
