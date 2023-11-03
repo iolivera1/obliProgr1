@@ -7,6 +7,8 @@ const OPTIMIZADA_MEMORIA = "r7";
 const TAMANIO_CHICO = "small";
 const TAMANIO_MEDIO = "medium";
 const TAMANIO_GRANDE = "large";
+
+
 let idTipoInstancia = 0;
 let idUsuario = 0;
 let idAlquiler = 0;
@@ -39,7 +41,7 @@ class Sistema {
    */
   login(nombreUsuario, contrasenia) {
     if (!nombreUsuario || !contrasenia) return false;
-    let usuario = this.encontrarUsuario(nombreUsuario);
+    let usuario = this.encontrarUsuarioPorNombre(nombreUsuario);
     if (!usuario) return false;
     if (usuario.contrasenia !== contrasenia) return false;
     this.usuarioActual = usuario;
@@ -59,18 +61,15 @@ class Sistema {
    * @returns true si el usuario es valido, false en otro caso
    */
   esNombreUsuarioValido(nombreUsuario) {
-    if (
-      nombreUsuario.length < 4 ||
-      nombreUsuario.length > 20 ||
-      Number(nombreUsuario)
-    ) {
+    if (nombreUsuario.length < 4 || nombreUsuario.length > 20 || Number(nombreUsuario)) 
+    {
       return false;
     }
     return true;
   }
 
   existeNombreDeUsuario(nombreUsuario) {
-    return this.encontrarUsuario(nombreUsuario) !== null;
+    return this.encontrarUsuarioPorNombre(nombreUsuario) !== null;
   }
 
   /**Busca un usuario por su nombre de usuario
@@ -78,20 +77,17 @@ class Sistema {
    * @param {String} nombreUsuario
    * @returns {Usuario} un objeto de la clase Usuarios, si lo encuentra en usuarios[]; null en otro caso
    */
-  encontrarUsuario(nombreUsuario) {
+  encontrarUsuarioPorNombre(nombreUsuario) {
     let usuario = null;
     let i = 0;
     while (i < this.usuarios.length && !usuario) {
-      usuario =
-        this.usuarios[i].nombreUsuario === nombreUsuario
-          ? this.usuarios[i]
-          : null;
+      usuario = this.usuarios[i].nombreUsuario === nombreUsuario ? this.usuarios[i] : null;
       i++;
     }
     return usuario;
   }
 
-  /**Busca un usuario por su nombre de usuario
+  /**Busca un usuario por su ID, en el array de usuarios
    *
    * @param {Number} idUsuario
    * @returns {Usuario} un objeto de la clase Usuarios, si lo encuentra en usuarios[]; null en otro caso
@@ -100,10 +96,7 @@ class Sistema {
     let usuario = null;
     let i = 0;
     while (i < this.usuarios.length && !usuario) {
-      usuario =
-        this.usuarios[i].id === idUsuario
-          ? this.usuarios[i]
-          : null;
+      usuario = (this.usuarios[i].id === idUsuario) ? this.usuarios[i] : null;
       i++;
     }
     return usuario;
@@ -120,22 +113,26 @@ class Sistema {
     let tieneMinuscula = false;
     let tieneNumero = false;
     let i = 0;
-    while (
-      i < contrasenia.length &&
-      (!tieneMayuscula || !tieneMinuscula || !tieneNumero)
-    ) {
-      tieneMayuscula =
-        contrasenia.charCodeAt(i) > 64 && contrasenia.charCodeAt(i) < 91
-          ? true
-          : tieneMayuscula;
-      tieneMinuscula =
-        contrasenia.charCodeAt(i) > 96 && contrasenia.charCodeAt(i) < 123
-          ? true
-          : tieneMinuscula;
+    while (i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero))
+    {
+      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) ? true : tieneMayuscula;
+      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) ? true : tieneMinuscula;
       tieneNumero = Number(contrasenia.charAt(i)) ? true : tieneNumero;
       i++;
     }
     return tieneMayuscula && tieneMinuscula && tieneNumero;
+  }
+
+  /*
+  * funciones auxiliares
+  */
+  esLetraMayuscula(letra)
+  {
+    return contrasenia.charCodeAt(i) > 64 && contrasenia.charCodeAt(i) < 91;
+  }
+  esLetraMinuscula(letra)
+  {
+    return contrasenia.charCodeAt(i) > 96 && contrasenia.charCodeAt(i) < 123;
   }
 
   /** Validacion de contrasenia
@@ -202,28 +199,19 @@ class Sistema {
     }
   }
 
-  otorgarInstanciaAUsuario(usuario, costoPorEncendido, costoPorAlquiler) {
-    usuario.instancias.push(
-      new TipoInstancia(costoPorEncendido, costoPorAlquiler)
-    );
+
+  crearAlquilerDeInstancia()
+  {
+
   }
 
   preCargarDatos() {
-    this.usuarios.push(
-      new Usuario(
-        "Admin",
-        "Admin",
-        "admin",
-        "admin",
-        1111111111111111,
-        111,
-        true,
-        []
-      )
-    );
+    this.crearUsuario("Admin", "Admin", "admin", "admin");
     this.usuarios[0].estado = ESTADO_ACTIVO;
+    this.usuarios[0].esAdmin = true;
   }
 
+  //Recibe tipo (puede ser c7, i7, r7)
   filtrarTiposDeInstanciasPorOptimizacion(tipo) {
     let resultado = [];
     for (i = 0; i < this.tiposDeInstancias.length; i++) {
@@ -234,12 +222,25 @@ class Sistema {
     return resultado;
   }
 
-  esUsuarioActivo(usuario) {
-    if (usuario.estado == ESTADO_ACTIVO) {
-      return true;
-    } else {
-      return false;
+  /**
+   *
+   * @param {Number} id
+   * @returns un objeto de la clase Usuarios, si lo encuentra; null en otro caso
+   */
+  buscarInstanciaporID(id) {
+    let encontrada = null;
+    let i = 0;
+    while (i < this.tiposDeInstancia.length && !encontrada) {
+      if (this.tiposDeInstancia[i].id === id) {
+        encontrada = this.tiposDeInstancia[i];
+      }
+      i++;
     }
+    return encontrada;
+  }
+
+  esUsuarioActivo(usuario) {
+    return usuario.estado === ESTADO_ACTIVO;
   }
 }
 
@@ -252,19 +253,8 @@ class Usuario {
    * @param {String} contrasenia
    * @param {Number} tarjeta
    * @param {Number} cvc
-   * @param {Boolean} esAdmin
-   * @param {Array} alquileres
    */
-  constructor(
-    nombre,
-    apellido,
-    nombreUsuario,
-    contrasenia,
-    tarjeta,
-    cvc,
-    esAdmin,
-    alquieres
-  ) {
+  constructor(nombre, apellido, nombreUsuario, contrasenia, tarjeta, cvc) {
     this.id = idUsuario++;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -272,9 +262,8 @@ class Usuario {
     this.contrasenia = contrasenia;
     this.tarjeta = tarjeta;
     this.cvc = cvc;
-    this.instancias = [];
-    this.esAdmin = esAdmin;
-    this.alquieres = alquieres;
+    this.esAdmin = false;
+    this.alquieres = [];
     this.estado = ESTADO_PENDIENTE;
   }
 }
@@ -327,4 +316,3 @@ class Alquiler {
     this.encendido = false;
   }
 }
-

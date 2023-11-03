@@ -28,7 +28,10 @@ document
   .addEventListener("click", crearUsuario);
 
 document
-  .querySelector("#slcTipoInstanciaSeleccionada")
+  .querySelector("#btnYaTengoUsuario")
+  .addEventListener("click", limpiarRegistro);
+document
+  .querySelector("#slcTipoOptimizacion")
   .addEventListener("change", montarOpcionesInstancias);
 
 document
@@ -44,6 +47,23 @@ document
 
 habilitarNavegacion();
 mostrarPagina("#divLoginUsuario");
+
+/**
+ * Limpia la seccion de registro al cambiar de pagina
+ */
+function limpiarRegistro()
+{
+  document.querySelector("#txtNombreRegisto").value = ``;
+  document.querySelector("#txtApellidoRegisto").value = ``;
+  document.querySelector("#txtUsernameRegistro").value = ``;
+  document.querySelector("#txtContraseniaRegistro").value = ``;
+  document.querySelector("#txtContraseniaRepeticionRegistro").value = ``;
+  document.querySelector("#txtTarjetaCreditoNumero").value = ``;
+  document.querySelector("#txtCVC").value = ``;
+  document.querySelector("#pMsjRegistroUsuario").innerHTML = ``;
+  document.querySelector("#divRegistroFormaDePago").style.display = "none";
+
+}
 
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
@@ -134,13 +154,8 @@ function crearUsuario() {
  * @param {String} repeticionContrasenia
  * @returns true si no hay mensajes de error para mostrar; false en otro caso
  */
-function datosDeRegistroSonValidos(
-  nombre,
-  apellido,
-  userName,
-  contrasenia,
-  repeticionContrasenia
-) {
+function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia) 
+{
   let msjError = ``;
   if (!nombre.length || !apellido.length) {
     msjError += `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
@@ -193,12 +208,12 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
 
 /**
  * En la seccion alquiler, carga el segundo combo box dinamicamente usando el value del primer combo box
+ * this seria en este contexto, el elemento <option> seleccionado en el primer select
  */
 function montarOpcionesInstancias() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
-  let opcionSelect = Number(
-    document.querySelector("#slcTipoInstanciaSeleccionada").value
-  );
+  
+  this.value;
   let divSelect = document.querySelector("#divTipoDeInstancia");
   let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
@@ -220,6 +235,7 @@ function montarOpcionesInstancias() {
  * @param {*} indice
  */
 function cargarSelect(select, indice) {
+  
   let opciones = TIPOS_INSTANCIA[indice];
   let preciosAlquiler = PRECIOS_ALQUILER[indice];
   let preciosEncendido = PRECIOS_ENCENDIDO[indice];
@@ -251,9 +267,7 @@ function mostrarPrecioInstanciaSeleccionada() {
     return;
   }
 
-  let optionElement = selectOpciones.querySelector(
-    `option[value="${opcionSeleccionada}"]`
-  );
+  let optionElement = selectOpciones.querySelector(`option[value="${opcionSeleccionada}"]`);
   let alquiler = optionElement.getAttribute("data-precio_alquiler");
   let encendido = optionElement.getAttribute("data-precio_encendido");
 
@@ -288,8 +302,8 @@ function login() {
       mostrarPagina("#divAlquilerDeInstancias");
     }
   }
-  usuario.value = ''
-  contraseña.value = ''
+  usuario.value = "";
+  contraseña.value = "";
 }
 
 function logout() {
@@ -315,12 +329,14 @@ function actualizarTablaUsuario() {
 
 actualizarTablaUsuario(); // el profe dijo que lo dejemos asi (?
 
+//ojo! no podemos usar forEach
 function actualizarEventosBotonesTabla() {
   let botones = document.querySelectorAll(".btnAlternarEstadoUsuario");
 
-  botones.forEach((boton) => {
-    boton.addEventListener("click", actualizarEstadoUsuario);
-  });
+  for(let i = 0; i < botones.length; i++)
+  {
+    botones[i].addEventListener("click", actualizarEstadoUsuario);
+  }
 }
 
 function actualizarEstadoUsuario() {
@@ -339,4 +355,3 @@ function actualizarEstadoUsuario() {
 
   actualizarTablaUsuario();
 }
-
