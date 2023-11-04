@@ -1,23 +1,6 @@
-const WARNING_ICON = `<img src="img/warning.webp" height="20px" alt="Advertencia">`;
-const DENIED_ICON = `<img src="img/error.webp" height="20px" alt="Denegado">`;
-const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado">`;
-const TEXTO_ALQUILER = ` - Costo por alquiler: U$S`;
-const TEXTO_ENCENDIDO = ` - costo de encendido: U$S`;
-const TIPOS_INSTANCIA = [
-  ["c7.small", "c7.medium", "c7.large"],
-  ["r7.small", "r7.medium", "r7.large"],
-  ["i7.medium", "i7.large"],
-];
-const PRECIOS_ALQUILER = [
-  [20, 30, 50],
-  [35, 50, 60],
-  [30, 50],
-];
-const PRECIOS_ENCENDIDO = [
-  [2.5, 3.5, 6.0],
-  [4.0, 6.5, 7.0],
-  [3.5, 6.5],
-];
+
+const TEXTO_$_ALQUILER = ` - Costo por alquiler: U$S`;
+const TEXTO_$_ENCENDIDO = `<br> - costo de encendido: U$S`;
 let sistema = new Sistema();
 sistema.preCargarDatos();
 
@@ -47,6 +30,7 @@ document
 
 habilitarNavegacion();
 mostrarPagina("#divLoginUsuario");
+cargarOptimizaciones();
 
 /**
  * Limpia la seccion de registro al cambiar de pagina
@@ -213,45 +197,46 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
 function montarOpcionesInstancias() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
   
-  this.value;
   let divSelect = document.querySelector("#divTipoDeInstancia");
-  let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
 
-  if (opcionSelect == -1) {
+  if (this.value == -1) {
     document.querySelector(
       "#pErrorAlquiler"
     ).innerHTML = `${DENIED_ICON} Seleccione una opción`;
     divSelect.style.display = "none";
   } else {
-    cargarSelect(selectCarga, opcionSelect);
+    cargarSelect(this.value);
     divSelect.style.display = "block";
   }
 }
 
-/** Carga el segundo select de forma mas rustica, pero agrega atributos custom a las opciones
- *
- * @param {*} select
- * @param {*} indice
+/**
+ * Esta implementacion usa un array de objetos en lugar de un array asociativo
  */
-function cargarSelect(select, indice) {
-  
-  let opciones = TIPOS_INSTANCIA[indice];
-  let preciosAlquiler = PRECIOS_ALQUILER[indice];
-  let preciosEncendido = PRECIOS_ENCENDIDO[indice];
-  while (select.options.length > 0) {
-    select.remove(0);
+function cargarOptimizaciones() {
+  let options = "<option value='-1'>Seleccione una opcion</option>";
+  for (let i = 0; i < sistema.optimizaciones.length; i++) {
+    let option = `<option value="${sistema.optimizaciones[i].prefijo}">${sistema.optimizaciones[i].texto}</option>`;
+    options += option;
   }
+  document.querySelector("#slcTipoOptimizacion").innerHTML = options;
+}
 
-  let opcion = `<option value="-1">Seleccione una opcion...</option>`;
 
-  select.innerHTML = opcion;
+/** Carga el segundo select de alquiler de forma dinamica
+  *
+ */
+function cargarSelect(tipo) {
 
-  for (i = 0; i < opciones.length; i++) {
-    opcion = `<option value="${i}" data-precio_alquiler="${preciosAlquiler[i]}" data-precio_encendido="${preciosEncendido[i]}">${opciones[i]}</option>`;
+  let instancias = sistema.filtrarTiposDeInstanciasPorOptimizacion(tipo);
+  if(!instancias.length) return;
 
-    select.innerHTML += opcion;
+  let opciones = `<option value="-1">Seleccione una opcion...</option>`;
+  for (i = 0; i < instancias.length; i++) {
+    opciones += `<option value="${instancias[i].id}">${instancias[i].tipo}.${instancias[i].tamanio}</option>`;
   }
+  document.querySelector("#slcTipoInstancia").innerHTML = opciones;
 }
 
 /**
@@ -260,27 +245,26 @@ function cargarSelect(select, indice) {
  */
 function mostrarPrecioInstanciaSeleccionada() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = ``;
-  let opcionSeleccionada = document.querySelector("#slcTipoInstancia").value;
-  let selectOpciones = document.querySelector("#slcTipoInstancia");
+  let idSeleccion = this.value;
+  let instanciaSeleccionada = sistema.buscarInstanciaporID(idSeleccion);
+  if(!instanciaSeleccionada) return;
 
-  if (Number(opcionSeleccionada) === -1) {
-    return;
-  }
+  let msjPrecio = TEXTO_$_ALQUILER + `<b>U$S${instanciaSeleccionada.costoPorAlquiler}</b>` + 
+  TEXTO_$_ENCENDIDO + `<b>${instanciaSeleccionada.costoPorEncendido}</b>`;
 
-  let optionElement = selectOpciones.querySelector(`option[value="${opcionSeleccionada}"]`);
-  let alquiler = optionElement.getAttribute("data-precio_alquiler");
-  let encendido = optionElement.getAttribute("data-precio_encendido");
-
-  let msjPrecio = `Esta instancia tiene un alquiler de <b>U$S ${alquiler}</b><br> 
-  y un precio por encendido de <b>U$S ${encendido}</b>`;
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = msjPrecio;
 }
 
-function alquilarMaquinaVirtual() {
-  let opcionSelecionada = document.querySelector("#slcTipoInstancia");
-  if (opcionSelecionada.value === -1) return;
-
-  //aqui pondria mi validacion de stock, si tuviera una!
+/** Crea un alquiler, si puede; muestra mensaje de resultado en pantalla
+ * 
+ * @returns true si puede crear un alquiler y asociarlo al usuario, false en otro caso
+ */
+function alquilarMaquinaVirtual() 
+{
+  let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
+  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(opcionSelecionada);
+  document.querySelector("#pMsjAlquilerInstancias").innerHTML = mensajeAlquiler;
+  return mensajeAlquiler === ALQUILER_EXITOSO;
 }
 
 /**
