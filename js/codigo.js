@@ -1,4 +1,3 @@
-
 const TEXTO_$_ALQUILER = ` - Costo por alquiler: U$S`;
 const TEXTO_$_ENCENDIDO = `<br> - costo de encendido: U$S`;
 let sistema = new Sistema();
@@ -98,31 +97,16 @@ function crearUsuario() {
   let apellido = document.querySelector("#txtApellidoRegisto").value;
   let userName = document.querySelector("#txtUsernameRegistro").value;
   let contrasenia = document.querySelector("#txtContraseniaRegistro").value;
-  let repeticionContrasenia = document.querySelector(
-    "#txtContraseniaRepeticionRegistro"
-  ).value;
-  let nroTarjetaCredito = document.querySelector(
-    "#txtTarjetaCreditoNumero"
-  ).value;
+  let repeticionContrasenia = document.querySelector("#txtContraseniaRepeticionRegistro").value;
+  let nroTarjetaCredito = document.querySelector("#txtTarjetaCreditoNumero").value;
   let cvc = document.querySelector("#txtCVC").value;
 
-  if (
-    !datosDeRegistroSonValidos(
-      nombre,
-      apellido,
-      userName,
-      contrasenia,
-      repeticionContrasenia
-    )
-  )
-    return;
+  if (!datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia)) return;
 
   document.querySelector("#divRegistroFormaDePago").style.display = "block";
   if (!formaDePagoEsValida(nroTarjetaCredito, cvc)) return;
 
-  document.querySelector(
-    "#pMsjRegistroUsuario"
-  ).innerHTML = `${APPROVED_ICON} Usuario pendiente de activacion`;
+  document.querySelector("#pMsjRegistroUsuario").innerHTML = MENSAJE_USUARIO_CREADO_CORRECTAMENTE;
   sistema.crearUsuario(nombre, apellido, userName, contrasenia);
 
   let tabla = document.querySelector("#tablaUsuarios");
@@ -138,30 +122,9 @@ function crearUsuario() {
  * @param {String} repeticionContrasenia
  * @returns true si no hay mensajes de error para mostrar; false en otro caso
  */
-function datosDeRegistroSonValidos(
-  nombre,
-  apellido,
-  userName,
-  contrasenia,
-  repeticionContrasenia
-) {
-  let msjError = ``;
-  if (!nombre.length || !apellido.length) {
-    msjError += `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
-  }
-  if (sistema.existeNombreDeUsuario(userName)) {
-    msjError += `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
-  }
-  if (!sistema.esNombreUsuarioValido(userName)) {
-    msjError += `${DENIED_ICON} El nombre de usuario debe tener entre 4 y 20 caracteres. No puede ser un numero <br>`;
-  }
-  if (!sistema.esContraseniaValida(contrasenia)) {
-    msjError += `${DENIED_ICON} La contraseña debe tener al menos 5 caracteres y
-    por lo menos una letra mayuscula, una minuscula y un numero <br>`;
-  }
-  if (!sistema.contraseniasCoinciden(contrasenia, repeticionContrasenia)) {
-    msjError = `${DENIED_ICON} Las contraseñas no coinciden <br>`;
-  }
+function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia) 
+{
+  let msjError = sistema.validarDatosRegistro(nombre, apellido, userName, contrasenia, repeticionContrasenia)
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
 

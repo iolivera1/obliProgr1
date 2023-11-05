@@ -3,6 +3,14 @@ const DENIED_ICON = `<img src="img/error.webp" height="20px" alt="Denegado">`;
 const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado">`;
 const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
 
+const ERROR_REGISTRO_NOMBRE_APELLIDO = `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
+const ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO = `${DENIED_ICON} El nombre de usuario debe tener entre 4 y 20 caracteres. No puede ser un numero <br>`;
+const ERROR_REGISTRO_EXISTE_USUARIO = `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
+const ERROR_REGISTRO_CONTRASENIA_INVALIDA = `${DENIED_ICON} La contraseña debe tener al menos 5 caracteres y por lo menos una letra mayuscula, una minuscula y un numero <br>`;
+const ERROR_REGISTRO_REPETICION_CONTRASENIA = `${DENIED_ICON} Las contraseñas no coinciden <br>`;
+
+const MENSAJE_USUARIO_CREADO_CORRECTAMENTE = `${APPROVED_ICON} Usuario pendiente de activacion`;
+
 const ESTADO_PENDIENTE = "pendiente";
 const ESTADO_ACTIVO = "activo";
 const ESTADO_BLOQUEADO = "bloqueado";
@@ -30,18 +38,6 @@ class Sistema {
     this.optimizaciones = [];
   }
 
-  /** En este punto todas las validaciones se tienen que haber realizado
-   *  Agrega un usuario al array de usuarios
-   *
-   * @param {String} nombre
-   * @param {String} apellido
-   * @param {String} nombreUsuario
-   * @param {String} contrasenia
-   */
-  crearUsuario(nombre, apellido, nombreUsuario, contrasenia) {
-    let usuario = new Usuario(nombre, apellido, nombreUsuario, contrasenia);
-    this.usuarios.push(usuario);
-  }
 
   /**Valida usuario y contrasenia, asigna al usuario actual si logra loguearlo
    *
@@ -65,10 +61,57 @@ class Sistema {
     this.usuarioActual = null;
   }
 
+  
+  /** En este punto todas las validaciones se tienen que haber realizado
+   *  Agrega un usuario al array de usuarios
+   *
+   * @param {String} nombre
+   * @param {String} apellido
+   * @param {String} nombreUsuario
+   * @param {String} contrasenia
+   */
+  crearUsuario(nombre, apellido, nombreUsuario, contrasenia) {
+    let usuario = new Usuario(nombre, apellido, nombreUsuario, contrasenia);
+    this.usuarios.push(usuario);
+  }
+
+
+   /** Valida que los datos con los que se intenta registrar un usario sean validos
+   * No incluye validaciones de forma de pago, ya que se activan al validar estos datos
+   * 
+   * @param {String} nombre 
+   * @param {String} apellido 
+   * @param {String} nombreUsuario 
+   * @param {String} contrasenia 
+   * @param {String} contraseniaRepeticion 
+   * @returns {String} Mensaje de error si algun dato es invalido, null en otro caso
+   */
+  validarDatosRegistro(nombre, apellido, nombreUsuario, contrasenia, contraseniaRepeticion)
+  {
+    let msjError = null;
+    msjError += this.esNombreYApellidoValido(nombre, apellido) ? ERROR_REGISTRO_NOMBRE_APELLIDO : null ;
+    msjError += this.esNombreUsuarioValido(nombreUsuario) ? ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO : null;
+    msjError += this.existeNombreDeUsuario(nombreUsuario) ? ERROR_REGISTRO_EXISTE_USUARIO : null;
+    msjError += this.esContraseniaValida(contrasenia) ? ERROR_REGISTRO_CONTRASENIA_INVALIDA : null;
+    msjError += this.contraseniasCoinciden(contrasenia, contraseniaRepeticion) ? ERROR_REGISTRO_REPETICION_CONTRASENIA : null;
+    return msjError;
+  }
+
+  /** Valida nombre y apellido con el que se intenta registrar
+   * 
+   * @param {String} nombre 
+   * @param {String} apellido 
+   * @returns {Boolean} true si alguno de los datos es vacio o un numero, false en otro caso
+   */
+  esNombreYApellidoValido(nombre, apellido)
+  {
+    return !nombre.length || !apellido.length || Number(nombre) || Number(apellido);
+  }
+
   /**Un nombre de usuario es valido si tiene al menos 4 caracteres y no mas de 20
    *
    * @param {String} nombreUsuario
-   * @returns true si el usuario es valido, false en otro caso
+   * @returns {Boolean} true si el usuario es valido, false en otro caso
    */
   esNombreUsuarioValido(nombreUsuario) {
     if (
@@ -81,8 +124,22 @@ class Sistema {
     return true;
   }
 
+  /** Validacion de registro: existencia de nombre de usuario
+   * 
+   * @param {String} nombreUsuario 
+   * @returns {Boolean} true si el nombre de usuario que se quiere registrar ya esta en uso 
+   */
   existeNombreDeUsuario(nombreUsuario) {
     return this.encontrarUsuarioPorNombre(nombreUsuario) !== null;
+  }
+
+  /**
+   * 
+   * @param {Usuario} usuario 
+   * @returns true si el usuario esta activo 
+   */
+  esUsuarioActivo(usuario) {
+    return usuario.estado === ESTADO_ACTIVO;
   }
 
   /**Busca un usuario por su nombre de usuario
@@ -129,17 +186,11 @@ class Sistema {
     let tieneMayuscula = false;
     let tieneMinuscula = false;
     let tieneNumero = false;
-
-    for (
-      let i = 0;
-      i < contrasenia.length &&
-      (!tieneMayuscula || !tieneMinuscula || !tieneNumero);
-      i++
-    ) {
-      tieneMayuscula =
-        this.esLetraMayuscula(contrasenia.charCodeAt(i)) || tieneMayuscula;
-      tieneMinuscula =
-        this.esLetraMinuscula(contrasenia.charCodeAt(i)) || tieneMinuscula;
+    let i = 0;
+    while( i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)) 
+    {
+      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) || tieneMayuscula;
+      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) || tieneMinuscula;
       tieneNumero = this.esNumero(contrasenia.charAt(i)) || tieneNumero;
     }
 
@@ -194,13 +245,17 @@ class Sistema {
     if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3) return false;
     let tarjetaConDuplicado = this.tarjetaConDuplicado(nroTarjeta);
     let sumaDeDigitos = this.tarjetaConDigitosSumados(tarjetaConDuplicado);
-
-    return (
-      (sumaDeDigitos * 9) % 10 ===
-      Number(nroTarjeta.charAt(nroTarjeta.length - 1))
-    );
+    let resultado = (sumaDeDigitos * 9) % 10;
+    let digitoVerificador = Number(nroTarjeta.charAt(nroTarjeta.length - 1));
+    return resultado === digitoVerificador;
   }
 
+  /** toma cada digito del numero ingresado y duplica solo los que esten en 
+   *  posiciones pares antes de ingresarlo en resultado[]
+   * 
+   * @param {Number} nroTarjeta 
+   * @returns [] array de numeros 
+   */
   tarjetaConDuplicado(nroTarjeta) {
     let resultado = [];
 
@@ -230,6 +285,11 @@ class Sistema {
     return resultado;
   }
 
+  /** Si el numero ingresado es mayor a 9, devuelve la unidad del numero + 1
+   * 
+   * @param {Number} numero 
+   * @returns {Number} 
+   */
   sumarDigitos(numero) {
     if (numero > 9) {
       return (numero % 10) + 1;
@@ -240,7 +300,7 @@ class Sistema {
 
   crearAlquilerDeInstancia() {}
 
-  /** Valida stock antes de crear un usuario
+  /** Valida stock antes de crear un alquiler
    * 
    * @param {String} id_instancia 
    */
@@ -258,32 +318,6 @@ class Sistema {
 
     return mensajeStock;
   
-  }
-
-  preCargarDatos() {
-    this.precargarInstancias()
-    //carga de tipos distintos de optimizacion
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_ALMACENAMIENTO, "Optimizada para almacenamiento"));
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo"));
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria"));
-    //carga de instancias optimizadas para computo
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10));
-    //carga de instancias optimizadas para memoria
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10));
-    //carga de instancias optimizadas para almacenamiento
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
-
-    //carga de usuario admin
-    this.crearUsuario("Admin", "Admin", "admin", "admin");
-    this.usuarios[0].estado = ESTADO_ACTIVO;
-    this.usuarios[0].esAdmin = true;
-    this.crearUsuario("User", "User", "user", "user");
-    this.usuarios[1].estado = ESTADO_ACTIVO;
   }
 
   /**Recibe tipo (puede ser c7, i7, r7)
@@ -317,23 +351,9 @@ class Sistema {
     return encontrada;
   }
 
-  esUsuarioActivo(usuario) {
-    return usuario.estado === ESTADO_ACTIVO;
-  }
 
-  precargarInstancias() {
-    this.crearInstancia(2.50, 20.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(6.00, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(4.00, 35.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(6.50, 50.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(7.00, 60.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
-    this.crearInstancia(6.50, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
-    console.log(this.tiposDeInstancias, "instancias");
 
-  }
-
+  
   crearInstancia(costoEncendido, costoAlquiler, tamanio, tipo, stockInicial) {
     let tipoInstancia = new TipoInstancia(
       costoEncendido,
@@ -342,7 +362,45 @@ class Sistema {
       tipo,
       stockInicial
     );
-    this.tiposDeInstancias.push(tipoInstancia);
+    this.tiposDeInstanciasDisponibles.push(tipoInstancia);
+  }
+
+  precargarInstancias() {
+    this.crearInstancia(2.50, 20.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(6.00, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(4.00, 35.00, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(6.50, 50.00, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(7.00, 60.00, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10);
+    this.crearInstancia(6.50, 50.00, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
+
+  }
+  
+  preCargarDatos() {
+    //this.precargarInstancias()
+    //carga de tipos distintos de optimizacion
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_ALMACENAMIENTO, "Optimizada para almacenamiento"));
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo"));
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria"));
+    //carga de instancias optimizadas para computo
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10));
+    //carga de instancias optimizadas para memoria
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10));
+    //carga de instancias optimizadas para almacenamiento
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
+
+    //carga de usuario admin
+    this.crearUsuario("Admin", "Admin", "admin", "admin");
+    this.usuarios[0].estado = ESTADO_ACTIVO;
+    this.usuarios[0].esAdmin = true;
+    this.crearUsuario("User", "User", "user", "user");
+    this.usuarios[1].estado = ESTADO_ACTIVO;
   }
 }
 
