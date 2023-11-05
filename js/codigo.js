@@ -43,6 +43,8 @@ document
   .querySelector("#btnAlquilarVM")
   .addEventListener("click", alquilarMaquinaVirtual);
 
+  // document.querySelector('#btnVerListadoAlquileres').addEventListener('click', mostrar) aca coso
+
 //fin eventos fijos
 
 habilitarNavegacion();
@@ -51,8 +53,7 @@ mostrarPagina("#divLoginUsuario");
 /**
  * Limpia la seccion de registro al cambiar de pagina
  */
-function limpiarRegistro()
-{
+function limpiarRegistro() {
   document.querySelector("#txtNombreRegisto").value = ``;
   document.querySelector("#txtApellidoRegisto").value = ``;
   document.querySelector("#txtUsernameRegistro").value = ``;
@@ -62,7 +63,6 @@ function limpiarRegistro()
   document.querySelector("#txtCVC").value = ``;
   document.querySelector("#pMsjRegistroUsuario").innerHTML = ``;
   document.querySelector("#divRegistroFormaDePago").style.display = "none";
-
 }
 
 /**
@@ -154,8 +154,13 @@ function crearUsuario() {
  * @param {String} repeticionContrasenia
  * @returns true si no hay mensajes de error para mostrar; false en otro caso
  */
-function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia) 
-{
+function datosDeRegistroSonValidos(
+  nombre,
+  apellido,
+  userName,
+  contrasenia,
+  repeticionContrasenia
+) {
   let msjError = ``;
   if (!nombre.length || !apellido.length) {
     msjError += `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
@@ -167,11 +172,11 @@ function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repe
     msjError += `${DENIED_ICON} El nombre de usuario debe tener entre 4 y 20 caracteres. No puede ser un numero <br>`;
   }
   if (!sistema.esContraseniaValida(contrasenia)) {
-    msjError += `${DENIED_ICON} La contrasenia debe tener al menos 5 caracteres y
+    msjError += `${DENIED_ICON} La contraseña debe tener al menos 5 caracteres y
     por lo menos una letra mayuscula, una minuscula y un numero <br>`;
   }
   if (!sistema.contraseniasCoinciden(contrasenia, repeticionContrasenia)) {
-    msjError = `${DENIED_ICON} Las contrasenias no coinciden <br>`;
+    msjError = `${DENIED_ICON} Las contraseñas no coinciden <br>`;
   }
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
@@ -212,15 +217,15 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
  */
 function montarOpcionesInstancias() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
-  
-  this.value;
+
+  let opcionSelect = this.value;
   let divSelect = document.querySelector("#divTipoDeInstancia");
   let selectCarga = document.querySelector("#slcTipoInstancia");
   document.querySelector("#pErrorAlquiler").innerHTML = ``;
 
   if (opcionSelect == -1) {
     document.querySelector(
-      "#pErrorAlquiler"
+      "#pMsjAlquilerInstancias"
     ).innerHTML = `${DENIED_ICON} Seleccione una opción`;
     divSelect.style.display = "none";
   } else {
@@ -235,7 +240,6 @@ function montarOpcionesInstancias() {
  * @param {*} indice
  */
 function cargarSelect(select, indice) {
-  
   let opciones = TIPOS_INSTANCIA[indice];
   let preciosAlquiler = PRECIOS_ALQUILER[indice];
   let preciosEncendido = PRECIOS_ENCENDIDO[indice];
@@ -267,7 +271,9 @@ function mostrarPrecioInstanciaSeleccionada() {
     return;
   }
 
-  let optionElement = selectOpciones.querySelector(`option[value="${opcionSeleccionada}"]`);
+  let optionElement = selectOpciones.querySelector(
+    `option[value="${opcionSeleccionada}"]`
+  );
   let alquiler = optionElement.getAttribute("data-precio_alquiler");
   let encendido = optionElement.getAttribute("data-precio_encendido");
 
@@ -279,6 +285,8 @@ function mostrarPrecioInstanciaSeleccionada() {
 function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia");
   if (opcionSelecionada.value === -1) return;
+
+  
 
   //aqui pondria mi validacion de stock, si tuviera una!
 }
@@ -294,8 +302,17 @@ function login() {
   if (sistema.login(usuario.value, contraseña.value) === false) {
     document.querySelector(
       "#pErrorLogin"
-    ).innerHTML = `${DENIED_ICON} La combinacion de usuario y contrasenha no son correctas`;
+    ).innerHTML = `${DENIED_ICON} La combinacion de usuario y contraseña no son correctas`;
   } else {
+    if (
+      sistema.usuarioActual.estado == ESTADO_PENDIENTE ||
+      sistema.usuarioActual.estado == ESTADO_BLOQUEADO
+    ) {
+      document.querySelector(
+        "#pErrorLogin"
+      ).innerHTML = `${DENIED_ICON} El usuario necesita ser habilitado`;
+      return;
+    }
     if (sistema.usuarioActual.esAdmin) {
       mostrarPagina("#divListadoUsuarios");
     } else {
@@ -333,8 +350,7 @@ actualizarTablaUsuario(); // el profe dijo que lo dejemos asi (?
 function actualizarEventosBotonesTabla() {
   let botones = document.querySelectorAll(".btnAlternarEstadoUsuario");
 
-  for(let i = 0; i < botones.length; i++)
-  {
+  for (let i = 0; i < botones.length; i++) {
     botones[i].addEventListener("click", actualizarEstadoUsuario);
   }
 }

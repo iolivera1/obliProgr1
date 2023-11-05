@@ -8,7 +8,6 @@ const TAMANIO_CHICO = "small";
 const TAMANIO_MEDIO = "medium";
 const TAMANIO_GRANDE = "large";
 
-
 let idTipoInstancia = 0;
 let idUsuario = 0;
 let idAlquiler = 0;
@@ -61,8 +60,11 @@ class Sistema {
    * @returns true si el usuario es valido, false en otro caso
    */
   esNombreUsuarioValido(nombreUsuario) {
-    if (nombreUsuario.length < 4 || nombreUsuario.length > 20 || Number(nombreUsuario)) 
-    {
+    if (
+      nombreUsuario.length < 4 ||
+      nombreUsuario.length > 20 ||
+      Number(nombreUsuario)
+    ) {
       return false;
     }
     return true;
@@ -81,7 +83,10 @@ class Sistema {
     let usuario = null;
     let i = 0;
     while (i < this.usuarios.length && !usuario) {
-      usuario = this.usuarios[i].nombreUsuario === nombreUsuario ? this.usuarios[i] : null;
+      usuario =
+        this.usuarios[i].nombreUsuario === nombreUsuario
+          ? this.usuarios[i]
+          : null;
       i++;
     }
     return usuario;
@@ -96,46 +101,69 @@ class Sistema {
     let usuario = null;
     let i = 0;
     while (i < this.usuarios.length && !usuario) {
-      usuario = (this.usuarios[i].id === idUsuario) ? this.usuarios[i] : null;
+      usuario = this.usuarios[i].id === idUsuario ? this.usuarios[i] : null;
       i++;
     }
     return usuario;
   }
 
-  /** validacion de contrasenia ingresada en el registro de usuario
+  /**
+   * Validación de contraseña ingresada en el registro de usuario
    *
    * @param {String} contrasenia
-   * @returns true si la contrasenia ingresada es valida para asociar a un usuario, false en otro caso
+   * @returns true si la contraseña ingresada es válida para asociar a un usuario, false en otro caso
    */
   esContraseniaValida(contrasenia) {
     if (contrasenia.length < 5) return false;
     let tieneMayuscula = false;
     let tieneMinuscula = false;
     let tieneNumero = false;
-    let i = 0;
-    while (i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero))
-    {
-      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) ? true : tieneMayuscula;
-      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) ? true : tieneMinuscula;
-      tieneNumero = Number(contrasenia.charAt(i)) ? true : tieneNumero;
-      i++;
+
+    for (
+      let i = 0;
+      i < contrasenia.length &&
+      (!tieneMayuscula || !tieneMinuscula || !tieneNumero);
+      i++
+    ) {
+      tieneMayuscula =
+        this.esLetraMayuscula(contrasenia.charCodeAt(i)) || tieneMayuscula;
+      tieneMinuscula =
+        this.esLetraMinuscula(contrasenia.charCodeAt(i)) || tieneMinuscula;
+      tieneNumero = this.esNumero(contrasenia.charAt(i)) || tieneNumero;
     }
+
     return tieneMayuscula && tieneMinuscula && tieneNumero;
   }
 
-  /*
-  * funciones auxiliares
-  */
-  esLetraMayuscula(letra)
-  {
-    return contrasenia.charCodeAt(i) > 64 && contrasenia.charCodeAt(i) < 91;
-  }
-  esLetraMinuscula(letra)
-  {
-    return contrasenia.charCodeAt(i) > 96 && contrasenia.charCodeAt(i) < 123;
+  /**
+   * Validación de letra mayúscula
+   *
+   * @param {Number} letra
+   */
+  esLetraMayuscula(letra) {
+    return letra >= 65 && letra <= 90;
   }
 
-  /** Validacion de contrasenia
+  /**
+   * Validación de letra minúscula
+   *
+   * @param {Number} letra
+   */
+  esLetraMinuscula(letra) {
+    return letra >= 97 && letra <= 122;
+  }
+
+  /**
+   * Validación de número
+   *
+   * @param {String} caracter
+   */
+  esNumero(caracter) {
+    return !isNaN(Number(caracter));
+  }
+
+  /**
+   * Validación de contraseñas coinciden
    *
    * @param {String} contrasenia
    * @param {String} contraseniaRepeticion
@@ -199,16 +227,16 @@ class Sistema {
     }
   }
 
-
-  crearAlquilerDeInstancia()
-  {
-
-  }
+  crearAlquilerDeInstancia() {}
 
   preCargarDatos() {
+    this.precargarInstancias()
     this.crearUsuario("Admin", "Admin", "admin", "admin");
     this.usuarios[0].estado = ESTADO_ACTIVO;
     this.usuarios[0].esAdmin = true;
+    this.crearUsuario("Ivan", "ivan", "ivan", "ivan");
+    this.usuarios[1].estado = ESTADO_ACTIVO;
+    this.usuarios[1].esAdmin = false;
   }
 
   //Recibe tipo (puede ser c7, i7, r7)
@@ -241,6 +269,30 @@ class Sistema {
 
   esUsuarioActivo(usuario) {
     return usuario.estado === ESTADO_ACTIVO;
+  }
+
+  precargarInstancias() {
+    this.crearInstancia(2.50, 20.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(6.00, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(4.00, 35.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(6.50, 50.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(7.00, 60.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 2);
+    this.crearInstancia(6.50, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 2);
+    console.log(this.tiposDeInstancias, "instancias");
+
+  }
+
+  crearInstancia(costoEncendido, costoAlquiler, tamanio, tipo, stockInicial) {
+    let tipoInstancia = new TipoInstancia(
+      costoEncendido,
+      costoAlquiler,
+      tamanio,
+      tipo,
+      stockInicial
+    );
+    this.tiposDeInstancias.push(tipoInstancia);
   }
 }
 
