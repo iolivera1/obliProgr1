@@ -1,3 +1,8 @@
+const WARNING_ICON = `<img src="img/warning.webp" height="20px" alt="Advertencia">`;
+const DENIED_ICON = `<img src="img/error.webp" height="20px" alt="Denegado">`;
+const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado">`;
+const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
+
 const ESTADO_PENDIENTE = "pendiente";
 const ESTADO_ACTIVO = "activo";
 const ESTADO_BLOQUEADO = "bloqueado";
@@ -8,6 +13,11 @@ const TAMANIO_CHICO = "small";
 const TAMANIO_MEDIO = "medium";
 const TAMANIO_GRANDE = "large";
 
+const MENSAJE_INSTANCIA_INCORRECTA = "Tipo de instancia incorrecto";
+const MENSAJE_INSTANCIA_SIN_STOCK = "No hay stock";
+const MENSAJE_INSTANCIA_OK = "OK";
+
+
 let idTipoInstancia = 0;
 let idUsuario = 0;
 let idAlquiler = 0;
@@ -16,7 +26,8 @@ class Sistema {
   constructor() {
     this.usuarios = [];
     this.usuarioActual = null;
-    this.tiposDeInstancias = [];
+    this.tiposDeInstanciasDisponibles = [];
+    this.optimizaciones = [];
   }
 
   /** En este punto todas las validaciones se tienen que haber realizado
@@ -229,22 +240,61 @@ class Sistema {
 
   crearAlquilerDeInstancia() {}
 
+  /** Valida stock antes de crear un usuario
+   * 
+   * @param {String} id_instancia 
+   */
+  crearAlquilerDeInstancia(id_instancia)
+  {
+
+    let instancia = this.buscarInstanciaporID(id_instancia);
+
+    let mensajeStock = this.validarStock(instancia);
+
+    if (mensajeStock === MENSAJE_INSTANCIA_OK) {
+      instancia.stock--;
+      //Crear un objeto del tipo alquiler, relacionando una instancia con el usuario actual
+    }
+
+    return mensajeStock;
+  
+  }
+
   preCargarDatos() {
     this.precargarInstancias()
+    //carga de tipos distintos de optimizacion
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_ALMACENAMIENTO, "Optimizada para almacenamiento"));
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo"));
+    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria"));
+    //carga de instancias optimizadas para computo
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10));
+    //carga de instancias optimizadas para memoria
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10));
+    //carga de instancias optimizadas para almacenamiento
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
+
+    //carga de usuario admin
     this.crearUsuario("Admin", "Admin", "admin", "admin");
     this.usuarios[0].estado = ESTADO_ACTIVO;
     this.usuarios[0].esAdmin = true;
-    this.crearUsuario("Ivan", "ivan", "ivan", "ivan");
+    this.crearUsuario("User", "User", "user", "user");
     this.usuarios[1].estado = ESTADO_ACTIVO;
-    this.usuarios[1].esAdmin = false;
   }
 
-  //Recibe tipo (puede ser c7, i7, r7)
+  /**Recibe tipo (puede ser c7, i7, r7)
+   * @param {String} tipo 
+   * @returns Array de objetos TipoInstancia, filtrado por tipo
+   */
   filtrarTiposDeInstanciasPorOptimizacion(tipo) {
     let resultado = [];
-    for (i = 0; i < this.tiposDeInstancias.length; i++) {
-      if (tipo === this.tiposDeInstancias.tipo) {
-        resultado.push(this.tiposDeInstancias[i]);
+    for (i = 0; i < this.tiposDeInstanciasDisponibles.length; i++) {
+      if (tipo === this.tiposDeInstanciasDisponibles[i].tipo) {
+        resultado.push(this.tiposDeInstanciasDisponibles[i]);
       }
     }
     return resultado;
@@ -258,9 +308,9 @@ class Sistema {
   buscarInstanciaporID(id) {
     let encontrada = null;
     let i = 0;
-    while (i < this.tiposDeInstancia.length && !encontrada) {
-      if (this.tiposDeInstancia[i].id === id) {
-        encontrada = this.tiposDeInstancia[i];
+    while (i < this.tiposDeInstanciasDisponibles.length && !encontrada) {
+      if (this.tiposDeInstanciasDisponibles[i].id === id) {
+        encontrada = this.tiposDeInstanciasDisponibles[i];
       }
       i++;
     }
@@ -342,6 +392,7 @@ class TipoInstancia {
     this.tamanio = tamanio;
     this.tipo = tipo;
     this.stockInicial = stockInicial;
+    this.stockActual = this.stockInicial;
   }
 }
 
@@ -366,5 +417,18 @@ class Alquiler {
 
   apagarMaquina() {
     this.encendido = false;
+  }
+}
+
+/**
+ * Esta clase es bastante auxiliar, pero no quiero usar arrays asociativos 
+ * Los arrays de arrays fueron una buena idea, pero esto va a ser la posta
+ */
+class Optimizacion
+{
+  constructor(prefijo, texto)
+  {
+    this.prefijo = prefijo;
+    this.texto = texto;
   }
 }
