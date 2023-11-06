@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="style/estilos.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OBLIGATORIO - OLIVERA y OLIVERI</title>
@@ -10,277 +11,252 @@
       <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
     </div>
 
-    <!--Navegacion basica-->
-    <div>
-      <ul>
-        <li>Login</li>
-        <li>Instancias Alquiladas</li>
-        <li></li>
-        <li></li>
-        <li>Log out</li>
-      </ul>
-    </div>
+    <div id="contenedor">
+      <!--Navegacion basica-->
+      <div id="cabezal" class="clearfix">
+        <ul id="navPrincipal">
+          <li>
+            <!--Admin-->
+            <a class="btnNavegacion btnAdmins" data-mostrar="divListadoUsuarios">
+              TODO HEADERS
+            </a>
+          </li>
 
-    <!--Login usuario-->
-    <div class="seccionPagina" id="divLoginUsuario" style="display: block">
-      <h3>Por favor, realiza el Login</h3>
-      <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
-      <input type="text" id="txtUsernameoLogin" />
-      <br />
-      <label for="txtContraseniaLogin">Contraseña:</label>
-      <input type="password" id="txtContraseniaLogin" />
-      <br />
-      <br />
-      <button id="btnLogin">Login</button>
-      <button
-        class="btnNavegacion"
-        id="btnEnviarLoginUsuario"
-        data-mostrar="divRegistroUsuarioNuevo"
-      >
-        Crear Usuario
-      </button>
-      <br />
-      <p id="pErrorLogin"></p>
-    </div>
-    <!--Fin login usuario-->
+        </ul>
+      </div>
 
-    <!--Registro de usuario-->
-    <div
-      class="seccionPagina"
-      id="divRegistroUsuarioNuevo"
-      style="display: none"
-    >
-      <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
-      <!-- Subseccion del registro: ingreso de credenciales-->
-      <div class="seccionRegistro" id="divRegistroCredenciales">
-        <label for="txtNombreRegisto">Nombre:</label>
-        <input type="text" id="txtNombreRegisto" />
+      <!--Login usuario-->
+      <div class="seccionPagina" id="divLoginUsuario" style="display: block">
+        <h3>Por favor, realiza el Login</h3>
+        <label for="txtNombreUsuarioLogin">Nombre de usuario:</label>
+        <input type="text" id="txtUsernameoLogin" />
         <br />
-        <label for="txtApellidoRegisto">Apellido:</label>
-        <input type="text" id="txtApellidoRegisto" />
+        <label for="txtContraseniaLogin">Contraseña:</label>
+        <input type="password" id="txtContraseniaLogin" />
         <br />
-        <label for="txtUsernameRegistro">Nombre de usuario:</label>
-        <input type="text" id="txtUsernameRegistro" />
         <br />
-        <label for="txtContraseniaRegistro">Contraseña:</label>
-        <input type="password" id="txtContraseniaRegistro" />
+        <button id="btnLogin">Login</button>
+        <button
+          class="btnNavegacion"
+          id="btnEnviarLoginUsuario"
+          data-mostrar="divRegistroUsuarioNuevo"
+        >
+          Crear Usuario
+        </button>
         <br />
-        <label for="txtContraseniaRepeticionRegistro">
-          Repita la contraseña:
+        <p id="pErrorLogin"></p>
+      </div>
+      <!--Fin login usuario-->
+
+      <!--Registro de usuario-->
+      <div class="seccionPagina" id="divRegistroUsuarioNuevo" style="display: none">
+        <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
+        <!-- Subseccion del registro: ingreso de credenciales-->
+        <div class="seccionRegistro" id="divRegistroCredenciales">
+          <label for="txtNombreRegisto">Nombre:</label>
+          <input type="text" id="txtNombreRegisto" />
+          <br />
+          <label for="txtApellidoRegisto">Apellido:</label>
+          <input type="text" id="txtApellidoRegisto" />
+          <br />
+          <label for="txtUsernameRegistro">Nombre de usuario:</label>
+          <input type="text" id="txtUsernameRegistro" />
+          <br />
+          <label for="txtContraseniaRegistro">Contraseña:</label>
+          <input type="password" id="txtContraseniaRegistro" />
+          <br />
+          <label for="txtContraseniaRepeticionRegistro">
+            Repita la contraseña:
+          </label>
+          <input type="password" id="txtContraseniaRepeticionRegistro" />
+          <br />
+        </div>
+        <!-- Fin de ingreso de credenciales-->
+
+        <!-- Subseccion del registro: Forma de pago-->
+        <div
+          class="seccionRegistro"
+          id="divRegistroFormaDePago"
+          style="display: none"
+        >
+          <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
+          <input type="text" id="txtTarjetaCreditoNumero" />
+          <br />
+          <label for="txtCVC">CVC:</label>
+          <input type="text" id="txtCVC" />
+        </div>
+        <!-- Fin de forma de pago-->
+
+        <button id="btnCrearUsuario">Enviar</button>
+        <button
+          class="btnNavegacion"
+          id="btnYaTengoUsuario"
+          data-mostrar="divLoginUsuario"
+        >
+          Ya tengo usuario
+        </button>
+
+        <p id="pMsjRegistroUsuario"></p>
+      </div>
+      <!--Fin registro de usuario-->
+
+      <!--Seccion de alquiler de una instancia-->
+      <div class="seccionPagina visibleUsuario" id="divAlquilerDeInstancias" style="display: none">
+        <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
+        <label for="slcTipoOptimizacion">
+          Seleccione un tipo de instancia
         </label>
-        <input type="password" id="txtContraseniaRepeticionRegistro" />
+        <select id="slcTipoOptimizacion">
+        </select>
         <br />
+        <br />
+        <div id="divTipoDeInstancia" style="display: none">
+          <label for="slcTipoInstancia">Seleccione una instancia</label>
+          <select id="slcTipoInstancia"></select>
+          <br />
+          <br />
+          <button id="btnAlquilarVM">Alquilar instancia</button>
+          <br />
+          <button id="btnVerListadoAlquileres" value="divListadoDeInstancias">Ver instancias alquiladas</button>
+          <br />
+          <p id="pMsjAlquilerInstancias"></p>
+        </div>
+
+        <br />
+        <p id="pErrorAlquiler"></p>
+
+        <button class="btnLogOut">Log out</button>
       </div>
-      <!-- Fin de ingreso de credenciales-->
+      <!--Fin seccion de alquiler de una instancia-->
 
-      <!-- Subseccion del registro: Forma de pago-->
-      <div
-        class="seccionRegistro"
-        id="divRegistroFormaDePago"
-        style="display: none"
-      >
-        <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
-        <input type="text" id="txtTarjetaCreditoNumero" />
+      <!--Seccion de listado de instancias alquiladas-->
+      <div class="seccionPagina visibleUsuario" id="divListadoDeInstancias" style="display: none">
+        <h3>Visualizacion de instancias alquiladas</h3>
+        <select id="slcFiltroTablaInstancias">
+          <option value="-1">Todas las instancias</option>
+        </select>
         <br />
-        <label for="txtCVC">CVC:</label>
-        <input type="text" id="txtCVC" />
+        <br />
+        <div style="display: flex; justify-content: center">
+          <table border="4" id="tableListadoDeInstancias">
+            <thead>
+              <tr>
+                <th>Tipo de instancia</th>
+                <th>Estado</th>
+                <th>Veces iniciada</th>
+                <th>Apagar/Encender</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>c7.small</th>
+                <th>Activa</th>
+                <th>1</th>
+                <th><button>Apagar</button></th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <!-- Fin de forma de pago-->
+      <!--Fin de seccion de listado de instancias alquiladas-->
 
-      <button id="btnCrearUsuario">Enviar</button>
-      <button
-        class="btnNavegacion"
-        id="btnYaTengoUsuario"
-        data-mostrar="divLoginUsuario"
-      >
-        Ya tengo usuario
-      </button>
-
-      <p id="pMsjRegistroUsuario"></p>
-    </div>
-    <!--Fin registro de usuario-->
-
-    <!--Seccion de alquiler de una instancia-->
-    <div
-      class="seccionPagina visibleUsuario"
-      id="divAlquilerDeInstancias"
-      style="display: none"
-    >
-      <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
-      <label for="slcTipoOptimizacion">
-        Seleccione un tipo de instancia
-      </label>
-      <select id="slcTipoOptimizacion">
-      </select>
-      <br />
-      <br />
-      <div id="divTipoDeInstancia" style="display: none">
-        <label for="slcTipoInstancia">Seleccione una instancia</label>
-        <select id="slcTipoInstancia"></select>
-        <br />
-        <br />
-        <button id="btnAlquilarVM">Alquilar instancia</button>
-        <br />
-        <button id="btnVerListadoAlquileres" value="divListadoDeInstancias">Ver instancias alquiladas</button>
-        <br />
-        <p id="pMsjAlquilerInstancias"></p>
-      </div>
-
-      <br />
-      <p id="pErrorAlquiler"></p>
-
-      <button class="btnLogOut">Log out</button>
-    </div>
-    <!--Fin seccion de alquiler de una instancia-->
-
-    <!--Seccion de listado de instancias alquiladas-->
-    <div
-      class="seccionPagina visibleUsuario"
-      id="divListadoDeInstancias"
-      style="display: none"
-    >
-      <h3>Visualizacion de instancias alquiladas</h3>
-      <select id="slcFiltroTablaInstancias">
-        <option value="-1">Todas las instancias</option>
-      </select>
-      <br />
-      <br />
-      <div style="display: flex; justify-content: center">
-        <table border="4" id="tableListadoDeInstancias">
+      <!--Seccion de totales a pagar por cada instancia-->
+      <div class="seccionPagina visibleUsuario" id="divTotalesAPagar" style="display: none">
+        <h3>Visualizacion de costos acumulados</h3>
+        <table border="4" id="tableCostosAcumulados">
           <thead>
             <tr>
               <th>Tipo de instancia</th>
-              <th>Estado</th>
-              <th>Veces iniciada</th>
-              <th>Apagar/Encender</th>
+              <th>Costo por encendido</th>
+              <th>Total de veces encendidas</th>
+              <th>Costo total</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <th>c7.small</th>
-              <th>Activa</th>
-              <th>1</th>
-              <th><button>Apagar</button></th>
-            </tr>
-          </tbody>
         </table>
       </div>
-    </div>
-    <!--Fin de seccion de listado de instancias alquiladas-->
+      <!--Fin de seccion de totales a pagar por cada instancia-->
 
-    <!--Seccion de totales a pagar por cada instancia-->
-    <div
-      class="seccionPagina visibleUsuario"
-      id="divTotalesAPagar"
-      style="display: none"
-    >
-      <h3>Visualizacion de costos acumulados</h3>
-      <table border="4" id="tableCostosAcumulados">
-        <thead>
-          <tr>
-            <th>Tipo de instancia</th>
-            <th>Costo por encendido</th>
-            <th>Total de veces encendidas</th>
-            <th>Costo total</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-    <!--Fin de seccion de totales a pagar por cada instancia-->
-
-    <!--ADMIN ONLY Listado de usuarios-->
-    <div
-      class="seccionPagina visibleAdmin"
-      id="divListadoUsuarios"
-      style="display: none"
-    >
-      <h3>Aprobacion de Usuarios</h3>
-      <div style="display: flex; justify-content: center">
-        <table border="4" id="tableListadoUsuarios">
-          <thead>
-            <tr>
-              <th>Nombre de usuario</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaUsuarios"></tbody>
-        </table>
+      <!--ADMIN ONLY Listado de usuarios-->
+      <div class="seccionPagina visibleAdmin" id="divListadoUsuarios" style="display: none">
+        <h3>Aprobacion de Usuarios</h3>
+        <div style="display: flex; justify-content: center">
+          <table border="4" id="tableListadoUsuarios">
+            <thead>
+              <tr>
+                <th>Nombre de usuario</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaUsuarios"></tbody>
+          </table>
+        </div>
+        <br />
+        <br />
+        <button class="btnLogOut">Log out</button>
       </div>
-      <br />
-      <br />
-      <button class="btnLogOut">Log out</button>
-    </div>
-    <!--Fin de Listado de usuarios-->
+      <!--Fin de Listado de usuarios-->
 
-    <!--ADMIN ONLY Actualizacion de stock de instancias-->
-    <div
-      class="seccionPagina visibleAdmin"
-      id="divStockInstancias"
-      style="display: none"
-    >
-      <h3>Visualizacion de Instancias Alquiladas</h3>
-      <label for="slcFiltroStockInstancias">
-        Seleccione un tipo de instancia
-      </label>
-      <br />
+      <!--ADMIN ONLY Actualizacion de stock de instancias-->
+      <div class="seccionPagina visibleAdmin" id="divStockInstancias" style="display: none">
+        <h3>Visualizacion de Instancias Alquiladas</h3>
+        <label for="slcFiltroStockInstancias">
+          Seleccione un tipo de instancia
+        </label>
+        <br />
 
-      <select id="slcFiltroStockInstancias">
-        <option value="-1">Seleccione una opcion</option>
-        <option value="0">Optimizada para cómputo</option>
-        <option value="1">Optimizada para memoria</option>
-        <option value="2">Optimizada para almacenamiento</option>
-      </select>
-      <br />
-      <br />
+        <select id="slcFiltroStockInstancias">
+          <option value="-1">Seleccione una opcion</option>
+          <option value="0">Optimizada para cómputo</option>
+          <option value="1">Optimizada para memoria</option>
+          <option value="2">Optimizada para almacenamiento</option>
+        </select>
+        <br />
+        <br />
 
-      <label for="txtNuevoStockIngresado">
-        Ingrese un nuevo Stock para el tipo seleccionado:
-      </label>
-      <br />
-      <input
-        type="text"
-        id="txtNuevoStockIngresado"
-        placeholder="Nuevo stock..."
-      />
-      <br />
-      <br />
+        <label for="txtNuevoStockIngresado">
+          Ingrese un nuevo Stock para el tipo seleccionado:
+        </label>
+        <br />
+        <input
+          type="text"
+          id="txtNuevoStockIngresado"
+          placeholder="Nuevo stock..."
+        />
+        <br />
+        <br />
 
-      <button id="btnEnviarNuevoStock">Actualizar</button>
-    </div>
-    <!--ADMIN ONLY Actualizacion de stock de instancias-->
-
-    <!--ADMIN ONLY Tabla de informe de instancias-->
-    <div
-      class="seccionPagina visibleAdmin"
-      id="divInformeInstancias"
-      style="display: none"
-    >
-      <h3>Visualizacion de Instancias Alquiladas</h3>
-      <div style="display: flex; justify-content: center">
-        <table border="4" id="tableListadoInstancias">
-          <thead>
-            <tr>
-              <th>Tipo de instancia</th>
-              <th>Veces incializada</th>
-              <th>Estado</th>
-              <th>Costo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>c7.small</th>
-              <th>1</th>
-              <th>activa</th>
-              <th>$22.50</th>
-            </tr>
-          </tbody>
-        </table>
+        <button id="btnEnviarNuevoStock">Actualizar</button>
       </div>
-      <p id="IngresoTotalInstancias">Ingreso total: $22.50</p>
-    </div>
-    <!--Fin de tabla de informe de instancias-->
+      <!--ADMIN ONLY Actualizacion de stock de instancias-->
 
+      <!--ADMIN ONLY Tabla de informe de instancias-->
+      <div class="seccionPagina visibleAdmin" id="divInformeInstancias" style="display: none">
+        <h3>Visualizacion de Instancias Alquiladas</h3>
+        <div style="display: flex; justify-content: center">
+          <table border="4" id="tableListadoInstancias">
+            <thead>
+              <tr>
+                <th>Tipo de instancia</th>
+                <th>Veces incializada</th>
+                <th>Estado</th>
+                <th>Costo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>c7.small</th>
+                <th>1</th>
+                <th>activa</th>
+                <th>$22.50</th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="IngresoTotalInstancias">Ingreso total: $22.50</p>
+      </div>
+      <!--Fin de tabla de informe de instancias-->
+    </div>
     <script src="js/clases.js"></script>
     <script src="js/codigo.js"></script>
   </body>
