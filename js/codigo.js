@@ -24,6 +24,9 @@ document.querySelector("#btnLogin").addEventListener("click", login);
 document
   .querySelector("#btnAlquilarVM")
   .addEventListener("click", alquilarMaquinaVirtual);
+  document
+    .querySelector("#btnVerListadoAlquileres")
+    .addEventListener("click", verAlquileresDeInstancias);
 
   // document.querySelector('#btnVerListadoAlquileres').addEventListener('click', mostrar) aca coso
 
@@ -233,6 +236,8 @@ function alquilarMaquinaVirtual()
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
   let mensajeAlquiler = sistema.crearAlquilerDeInstancia(opcionSelecionada);
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = mensajeAlquiler;
+  document.querySelector("#slcTipoInstancia").value = "-1";
+  document.querySelector("#slcTipoOptimizacion").value = "-1";
   return mensajeAlquiler === ALQUILER_EXITOSO;
 }
 
@@ -273,6 +278,13 @@ function logout() {
   mostrarPagina("#divLoginUsuario");
 }
 
+function verAlquileresDeInstancias(usuarioActual)
+{
+  
+  mostrarPagina(id)
+
+
+}
 function actualizarTablaUsuario() {
   let tabla = document.querySelector("#tablaUsuarios");
   let usuarios = sistema.usuarios;

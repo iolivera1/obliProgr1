@@ -25,6 +25,13 @@ const MENSAJE_INSTANCIA_INCORRECTA = "Tipo de instancia incorrecto";
 const MENSAJE_INSTANCIA_SIN_STOCK = "No hay stock";
 const MENSAJE_INSTANCIA_OK = "OK";
 
+const ELEMENTO_TABLA_INSTANCIAS = 
+`<tr>
+  <th>c7.small</th>
+  <th>Activa</th>
+  <th>1</th>
+  <th><button>Apagar</button></th>
+</tr>`
 
 let idTipoInstancia = 0;
 let idUsuario = 0;
@@ -36,6 +43,7 @@ class Sistema {
     this.usuarioActual = null;
     this.tiposDeInstanciasDisponibles = [];
     this.optimizaciones = [];
+    this.alquileres = [];
   }
 
 
@@ -308,17 +316,20 @@ class Sistema {
   {
 
     let instancia = this.buscarInstanciaporID(id_instancia);
-
-    let mensajeStock = this.validarStock(instancia);
-
-    if (mensajeStock === MENSAJE_INSTANCIA_OK) {
-      instancia.stock--;
-      //Crear un objeto del tipo alquiler, relacionando una instancia con el usuario actual
+    if(!instancia)
+    {
+      return MENSAJE_INSTANCIA_INCORRECTA;
     }
-
-    return mensajeStock;
-  
+    if(instancia.stockActual < 1)
+    {
+      return MENSAJE_INSTANCIA_SIN_STOCK;
+    }
+    instancia.stock--;
+    let nuevoAlquiler = new Alquiler(this.usuarioActual.id, instancia);
+    this.alquileres.push(nuevoAlquiler);
+    return MENSAJE_INSTANCIA_OK;
   }
+
 
   /**Recibe tipo (puede ser c7, i7, r7)
    * @param {String} tipo 
@@ -399,6 +410,7 @@ class Sistema {
     this.crearUsuario("Admin", "Admin", "admin", "admin");
     this.usuarios[0].estado = ESTADO_ACTIVO;
     this.usuarios[0].esAdmin = true;
+    //carga de usuario comun
     this.crearUsuario("User", "User", "user", "user");
     this.usuarios[1].estado = ESTADO_ACTIVO;
   }
