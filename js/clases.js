@@ -1,6 +1,6 @@
-const WARNING_ICON = `<img src="img/warning.webp" height="20px" alt="Advertencia">`;
-const DENIED_ICON = `<img src="img/error.webp" height="20px" alt="Denegado">`;
-const APPROVED_ICON = `<img src="img/approved.webp" height="20px" alt="Aprobado">`;
+const WARNING_ICON = `<img src="img/warning.webp" height="25px" alt="Advertencia">`;
+const DENIED_ICON = `<img src="img/error.webp" height="25px" alt="Denegado">`;
+const APPROVED_ICON = `<img src="img/approved.webp" height="25px" alt="Aprobado">`;
 const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
 
 const ERROR_REGISTRO_NOMBRE_APELLIDO = `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
@@ -96,12 +96,12 @@ class Sistema {
    */
   validarDatosRegistro(nombre, apellido, nombreUsuario, contrasenia, contraseniaRepeticion)
   {
-    let msjError = null;
-    msjError += this.esNombreYApellidoValido(nombre, apellido) ? ERROR_REGISTRO_NOMBRE_APELLIDO : null ;
-    msjError += this.esNombreUsuarioValido(nombreUsuario) ? ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO : null;
-    msjError += this.existeNombreDeUsuario(nombreUsuario) ? ERROR_REGISTRO_EXISTE_USUARIO : null;
-    msjError += this.esContraseniaValida(contrasenia) ? ERROR_REGISTRO_CONTRASENIA_INVALIDA : null;
-    msjError += this.contraseniasCoinciden(contrasenia, contraseniaRepeticion) ? ERROR_REGISTRO_REPETICION_CONTRASENIA : null;
+    let msjError = ``;
+    msjError += !this.esNombreYApellidoValido(nombre, apellido) ? ERROR_REGISTRO_NOMBRE_APELLIDO : `` ;
+    msjError += !this.esNombreUsuarioValido(nombreUsuario) ? ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO : ``;
+    msjError += this.existeNombreDeUsuario(nombreUsuario) ? ERROR_REGISTRO_EXISTE_USUARIO : ``;
+    msjError += !this.esContraseniaValida(contrasenia) ? ERROR_REGISTRO_CONTRASENIA_INVALIDA : ``;
+    msjError += !this.contraseniasCoinciden(contrasenia, contraseniaRepeticion) ? ERROR_REGISTRO_REPETICION_CONTRASENIA : ``;
     return msjError;
   }
 
@@ -113,7 +113,7 @@ class Sistema {
    */
   esNombreYApellidoValido(nombre, apellido)
   {
-    return !nombre.length || !apellido.length || Number(nombre) || Number(apellido);
+    return nombre.length > 0 && apellido.length > 0 && !Number(nombre) && !Number(apellido);
   }
 
   /**Un nombre de usuario es valido si tiene al menos 4 caracteres y no mas de 20
@@ -197,9 +197,10 @@ class Sistema {
     let i = 0;
     while( i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)) 
     {
-      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) || tieneMayuscula;
-      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) || tieneMinuscula;
-      tieneNumero = this.esNumero(contrasenia.charAt(i)) || tieneNumero;
+      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) ? true : tieneMayuscula;
+      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) ? true : tieneMinuscula;
+      tieneNumero = this.esNumero(contrasenia.charAt(i)) ? true : tieneNumero;
+      i++;
     }
 
     return tieneMayuscula && tieneMinuscula && tieneNumero;
