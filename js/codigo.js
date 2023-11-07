@@ -278,10 +278,24 @@ function logout() {
   mostrarPagina("#divLoginUsuario");
 }
 
-function verAlquileresDeInstancias(usuarioActual)
+function verAlquileresDeInstancias()
 {
-  
-  mostrarPagina(id)
+  document.querySelector("#tablaListadoDeInstancias").innerHTML = ``;
+  let alquileres = sistema.alquileresDeUsuarioActual();
+  if(!alquileres.length) return;
+
+  let tablaBody = ``;
+  for(let i = 0; i < alquileres.length; i++)
+  {
+    let alquiler = alquileres[i];
+    let instancia = alquiler.instancia;
+    let fila = `<td>${instancia.tipo}</td> <td>${instancia.encendido}</td> <td>${instancia.encendidos}</td> <td>boton</td>`; 
+    tablaBody += fila;
+  }
+
+
+  document.querySelector("#tablaListadoDeInstancias").innerHTML = tablaBody;
+  mostrarPagina("#divListadoDeInstancias");
 
 
 }
@@ -294,7 +308,7 @@ function actualizarTablaUsuario() {
       usuario.estado
     }</td><td>
     <button class="btnAlternarEstadoUsuario" value="${usuario.id}">${
-      sistema.esUsuarioActivo(usuario) == true ? "deshabilitar" : "habilitar"
+      sistema.esUsuarioActivo(usuario) == true ? "activar" : "bloquear"
     }</button></td></tr>`;
   });
   tabla.innerHTML = resultado;

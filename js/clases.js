@@ -328,6 +328,7 @@ class Sistema {
     instancia.stock--;
     let nuevoAlquiler = new Alquiler(this.usuarioActual.id, instancia);
     this.alquileres.push(nuevoAlquiler);
+    this.usuarioActual.alquileres.push(nuevoAlquiler);
     return MENSAJE_INSTANCIA_OK;
   }
 
@@ -363,6 +364,14 @@ class Sistema {
     return encontrada;
   }
 
+  /**
+   * 
+   * @returns Array de alquileres del usuario actual
+   */
+  alquileresDeUsuarioActual()
+  {
+    return this.usuarioActual.alquileres;
+  }
 
 
   
@@ -375,18 +384,6 @@ class Sistema {
       stockInicial
     );
     this.tiposDeInstanciasDisponibles.push(tipoInstancia);
-  }
-
-  precargarInstancias() {
-    this.crearInstancia(2.50, 20.00, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10);
-    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10);
-    this.crearInstancia(6.00, 50.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10);
-    this.crearInstancia(4.00, 35.00, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10);
-    this.crearInstancia(6.50, 50.00, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10);
-    this.crearInstancia(7.00, 60.00, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10);
-    this.crearInstancia(3.50, 30.00, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10);
-    this.crearInstancia(6.50, 50.00, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
-
   }
   
   preCargarDatos() {
@@ -436,7 +433,7 @@ class Usuario {
     this.tarjeta = tarjeta;
     this.cvc = cvc;
     this.esAdmin = false;
-    this.alquieres = [];
+    this.alquileres = [];
     this.estado = ESTADO_PENDIENTE;
   }
 }
