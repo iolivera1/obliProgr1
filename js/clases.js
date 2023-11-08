@@ -25,6 +25,9 @@ const MENSAJE_INSTANCIA_INCORRECTA = "Tipo de instancia incorrecto";
 const MENSAJE_INSTANCIA_SIN_STOCK = "No hay stock";
 const MENSAJE_INSTANCIA_OK = "OK";
 
+const INSTANCIA_ENCENDIDA = "Encendida";
+const INSTANCIA_APAGADA = "Apagada";
+
 const ELEMENTO_TABLA_INSTANCIAS = 
 `<tr>
   <th>c7.small</th>
@@ -212,7 +215,7 @@ class Sistema {
    * @param {Number} letra
    */
   esLetraMayuscula(letra) {
-    return letra >= 65 && letra <= 90;
+    return letra.charCodeAt(0) >= 65 && letra.charCodeAt(0) <= 90;
   }
 
   /**
@@ -221,7 +224,7 @@ class Sistema {
    * @param {Number} letra
    */
   esLetraMinuscula(letra) {
-    return letra >= 97 && letra <= 122;
+    return letra.charCodeAt(0) >= 97 && letra.charCodeAt(0) <= 122;
   }
 
   /**
@@ -307,8 +310,6 @@ class Sistema {
     }
   }
 
-  crearAlquilerDeInstancia() {}
-
   /** Valida stock antes de crear un alquiler
    * 
    * @param {String} id_instancia 
@@ -331,7 +332,6 @@ class Sistema {
     this.usuarioActual.alquileres.push(nuevoAlquiler);
     return MENSAJE_INSTANCIA_OK;
   }
-
 
   /**Recibe tipo (puede ser c7, i7, r7)
    * @param {String} tipo 

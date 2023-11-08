@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="style/esti0los.css" />
+    <link rel="stylesheet" href="style/estilos.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OBLIGATORIO - OLIVERA y OLIVERI</title>
   </head>
-  <body style="text-align: center">
+  <body>
+    <!--
     <div style="text-align: center">
       <h1 style="font-family: cursive">SISTEMA DE ALQUILER DE INSTANCIAS</h1>
-    </div>
+    </div>-->
 
     <div id="contenedor">
       <!--Navegacion basica-->
@@ -18,12 +19,49 @@
           <li>
             <!--Admin-->
             <a class="btnNavegacion btnAdmins" data-mostrar="divListadoUsuarios">
-              TODO HEADERS
+              Usuarios
+            </a>
+          </li>
+          <li>
+            <!--Admin-->
+            <a class="btnNavegacion btnAdmins" data-mostrar="divStockInstancias">
+              Stock
+            </a>
+          </li>
+          <li>
+            <!--Admin-->
+            <a class="btnNavegacion btnAdmins" data-mostrar="divInformeInstancias">
+              Facturacion
+            </a>
+          </li>
+          <li>
+            <!--User comun-->
+            <a class="btnNavegacion btnComun" data-mostrar="divAlquilerDeInstancias">
+              Alquilar
+            </a>
+          </li>
+          <li>
+            <!--User comun-->
+            <a class="btnNavegacion btnComun" data-mostrar="divListadoDeInstancias">
+              Vista Instancias
+            </a>
+          </li>
+          <li>
+            <!--User comun-->
+            <a class="btnNavegacion btnComun" data-mostrar="divTotalesAPagar">
+              Facturacion
+            </a>
+          </li>
+          <li>
+            <!--Log Out-->
+            <a class="btnNavegacion" data-mostrar="divLoginUsuario">
+              Log Out
             </a>
           </li>
 
         </ul>
       </div>
+      <!--FIN navegacion basica-->
 
       <!--Login usuario-->
       <div class="seccionPagina" id="divLoginUsuario" style="display: block">
@@ -55,7 +93,6 @@
         <div class="seccionRegistro" id="divRegistroCredenciales">
           <label for="txtNombreRegisto">Nombre:</label>
           <input type="text" id="txtNombreRegisto" />
-          <br />
           <label for="txtApellidoRegisto">Apellido:</label>
           <input type="text" id="txtApellidoRegisto" />
           <br />
@@ -138,7 +175,7 @@
         <br />
         <br />
         <div style="display: flex; justify-content: center">
-          <table border="4" id="tablaListadoDeInstancias">
+          <table border="4">
             <thead>
               <tr>
                 <th>Tipo de instancia</th>
@@ -147,7 +184,7 @@
                 <th>Apagar/Encender</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tablaListadoDeInstancias">
               <tr>
                 <td>c7.small</td>
                 <td>Activa</td>

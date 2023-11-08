@@ -289,7 +289,8 @@ function verAlquileresDeInstancias()
   {
     let alquiler = alquileres[i];
     let instancia = alquiler.instancia;
-    let fila = `<td>${instancia.tipo}</td> <td>${instancia.encendido}</td> <td>${instancia.encendidos}</td> <td>boton</td>`; 
+    let estado = alquiler.estado ? INSTANCIA_ENCENDIDA : INSTANCIA_ENCENDIDA;
+    let fila = `<tr><td>${instancia.tipo}</td> <td>${estado}</td> <td>${alquiler.encendidos}</td> <td>boton</td></tr>`; 
     tablaBody += fila;
   }
 
@@ -308,7 +309,7 @@ function actualizarTablaUsuario() {
       usuario.estado
     }</td><td>
     <button class="btnAlternarEstadoUsuario" value="${usuario.id}">${
-      sistema.esUsuarioActivo(usuario) == true ? "activar" : "bloquear"
+      sistema.esUsuarioActivo(usuario) == true ? "bloquear" : "activar"
     }</button></td></tr>`;
   });
   tabla.innerHTML = resultado;
