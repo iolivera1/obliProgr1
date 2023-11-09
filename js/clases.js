@@ -28,13 +28,12 @@ const MENSAJE_INSTANCIA_OK = "OK";
 const INSTANCIA_ENCENDIDA = "Encendida";
 const INSTANCIA_APAGADA = "Apagada";
 
-const ELEMENTO_TABLA_INSTANCIAS = 
-`<tr>
+const ELEMENTO_TABLA_INSTANCIAS = `<tr>
   <th>c7.small</th>
   <th>Activa</th>
   <th>1</th>
   <th><button>Apagar</button></th>
-</tr>`
+</tr>`;
 
 let idTipoInstancia = 0;
 let idUsuario = 0;
@@ -48,7 +47,6 @@ class Sistema {
     this.optimizaciones = [];
     this.alquileres = [];
   }
-
 
   /**Valida usuario y contrasenia, asigna al usuario actual si logra loguearlo
    *
@@ -72,7 +70,6 @@ class Sistema {
     this.usuarioActual = null;
   }
 
-  
   /** En este punto todas las validaciones se tienen que haber realizado
    *  Agrega un usuario al array de usuarios
    *
@@ -86,37 +83,55 @@ class Sistema {
     this.usuarios.push(usuario);
   }
 
-
-   /** Valida que los datos con los que se intenta registrar un usario sean validos
+  /** Valida que los datos con los que se intenta registrar un usario sean validos
    * No incluye validaciones de forma de pago, ya que se activan al validar estos datos
-   * 
-   * @param {String} nombre 
-   * @param {String} apellido 
-   * @param {String} nombreUsuario 
-   * @param {String} contrasenia 
-   * @param {String} contraseniaRepeticion 
+   *
+   * @param {String} nombre
+   * @param {String} apellido
+   * @param {String} nombreUsuario
+   * @param {String} contrasenia
+   * @param {String} contraseniaRepeticion
    * @returns {String} Mensaje de error si algun dato es invalido, null en otro caso
    */
-  validarDatosRegistro(nombre, apellido, nombreUsuario, contrasenia, contraseniaRepeticion)
-  {
+  validarDatosRegistro(
+    nombre,
+    apellido,
+    nombreUsuario,
+    contrasenia,
+    contraseniaRepeticion
+  ) {
     let msjError = ``;
-    msjError += !this.esNombreYApellidoValido(nombre, apellido) ? ERROR_REGISTRO_NOMBRE_APELLIDO : `` ;
-    msjError += !this.esNombreUsuarioValido(nombreUsuario) ? ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO : ``;
-    msjError += this.existeNombreDeUsuario(nombreUsuario) ? ERROR_REGISTRO_EXISTE_USUARIO : ``;
-    msjError += !this.esContraseniaValida(contrasenia) ? ERROR_REGISTRO_CONTRASENIA_INVALIDA : ``;
-    msjError += !this.contraseniasCoinciden(contrasenia, contraseniaRepeticion) ? ERROR_REGISTRO_REPETICION_CONTRASENIA : ``;
+    msjError += !this.esNombreYApellidoValido(nombre, apellido)
+      ? ERROR_REGISTRO_NOMBRE_APELLIDO
+      : ``;
+    msjError += !this.esNombreUsuarioValido(nombreUsuario)
+      ? ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO
+      : ``;
+    msjError += this.existeNombreDeUsuario(nombreUsuario)
+      ? ERROR_REGISTRO_EXISTE_USUARIO
+      : ``;
+    msjError += !this.esContraseniaValida(contrasenia)
+      ? ERROR_REGISTRO_CONTRASENIA_INVALIDA
+      : ``;
+    msjError += !this.contraseniasCoinciden(contrasenia, contraseniaRepeticion)
+      ? ERROR_REGISTRO_REPETICION_CONTRASENIA
+      : ``;
     return msjError;
   }
 
   /** Valida nombre y apellido con el que se intenta registrar
-   * 
-   * @param {String} nombre 
-   * @param {String} apellido 
+   *
+   * @param {String} nombre
+   * @param {String} apellido
    * @returns {Boolean} true si alguno de los datos es vacio o un numero, false en otro caso
    */
-  esNombreYApellidoValido(nombre, apellido)
-  {
-    return nombre.length > 0 && apellido.length > 0 && !Number(nombre) && !Number(apellido);
+  esNombreYApellidoValido(nombre, apellido) {
+    return (
+      nombre.length > 0 &&
+      apellido.length > 0 &&
+      !Number(nombre) &&
+      !Number(apellido)
+    );
   }
 
   /**Un nombre de usuario es valido si tiene al menos 4 caracteres y no mas de 20
@@ -136,21 +151,25 @@ class Sistema {
   }
 
   /** Validacion de registro: existencia de nombre de usuario
-   * 
-   * @param {String} nombreUsuario 
-   * @returns {Boolean} true si el nombre de usuario que se quiere registrar ya esta en uso 
+   *
+   * @param {String} nombreUsuario
+   * @returns {Boolean} true si el nombre de usuario que se quiere registrar ya esta en uso
    */
   existeNombreDeUsuario(nombreUsuario) {
     return this.encontrarUsuarioPorNombre(nombreUsuario) !== null;
   }
 
   /**
-   * 
-   * @param {Usuario} usuario 
-   * @returns true si el usuario esta activo 
+   *
+   * @param {Usuario} usuario
+   * @returns true si el usuario esta activo
    */
   esUsuarioActivo(usuario) {
     return usuario.estado === ESTADO_ACTIVO;
+  }
+
+  esUsuarioAdmin(usuario) {
+    return usuario.esAdmin;
   }
 
   /**Busca un usuario por su nombre de usuario
@@ -198,10 +217,16 @@ class Sistema {
     let tieneMinuscula = false;
     let tieneNumero = false;
     let i = 0;
-    while( i < contrasenia.length && (!tieneMayuscula || !tieneMinuscula || !tieneNumero)) 
-    {
-      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i)) ? true : tieneMayuscula;
-      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i)) ? true : tieneMinuscula;
+    while (
+      i < contrasenia.length &&
+      (!tieneMayuscula || !tieneMinuscula || !tieneNumero)
+    ) {
+      tieneMayuscula = this.esLetraMayuscula(contrasenia.charCodeAt(i))
+        ? true
+        : tieneMayuscula;
+      tieneMinuscula = this.esLetraMinuscula(contrasenia.charCodeAt(i))
+        ? true
+        : tieneMinuscula;
       tieneNumero = this.esNumero(contrasenia.charAt(i)) ? true : tieneNumero;
       i++;
     }
@@ -215,7 +240,7 @@ class Sistema {
    * @param {Number} letra
    */
   esLetraMayuscula(letra) {
-    return letra.charCodeAt(0) >= 65 && letra.charCodeAt(0) <= 90;
+    return letra >= 65 && letra <= 90;
   }
 
   /**
@@ -224,7 +249,7 @@ class Sistema {
    * @param {Number} letra
    */
   esLetraMinuscula(letra) {
-    return letra.charCodeAt(0) >= 97 && letra.charCodeAt(0) <= 122;
+    return letra >= 97 && letra <= 122;
   }
 
   /**
@@ -262,11 +287,11 @@ class Sistema {
     return resultado === digitoVerificador;
   }
 
-  /** toma cada digito del numero ingresado y duplica solo los que esten en 
+  /** toma cada digito del numero ingresado y duplica solo los que esten en
    *  posiciones pares antes de ingresarlo en resultado[]
-   * 
-   * @param {Number} nroTarjeta 
-   * @returns [] array de numeros 
+   *
+   * @param {Number} nroTarjeta
+   * @returns [] array de numeros
    */
   tarjetaConDuplicado(nroTarjeta) {
     let resultado = [];
@@ -298,9 +323,9 @@ class Sistema {
   }
 
   /** Si el numero ingresado es mayor a 9, devuelve la unidad del numero + 1
-   * 
-   * @param {Number} numero 
-   * @returns {Number} 
+   *
+   * @param {Number} numero
+   * @returns {Number}
    */
   sumarDigitos(numero) {
     if (numero > 9) {
@@ -311,30 +336,26 @@ class Sistema {
   }
 
   /** Valida stock antes de crear un alquiler
-   * 
-   * @param {String} id_instancia 
+   *
+   * @param {String} id_instancia
    */
-  crearAlquilerDeInstancia(id_instancia)
-  {
-
+  crearAlquilerDeInstancia(id_instancia) {
     let instancia = this.buscarInstanciaporID(id_instancia);
-    if(!instancia)
-    {
+    if (!instancia) {
       return MENSAJE_INSTANCIA_INCORRECTA;
     }
-    if(instancia.stockActual < 1)
-    {
+    if (instancia.stockActual < 1) {
       return MENSAJE_INSTANCIA_SIN_STOCK;
     }
-    instancia.stock--;
-    let nuevoAlquiler = new Alquiler(this.usuarioActual.id, instancia);
+    instancia.stockActual--;
+    let nuevoAlquiler = new Alquiler(this.usuarioActual.id, id_instancia);
     this.alquileres.push(nuevoAlquiler);
     this.usuarioActual.alquileres.push(nuevoAlquiler);
     return MENSAJE_INSTANCIA_OK;
   }
 
   /**Recibe tipo (puede ser c7, i7, r7)
-   * @param {String} tipo 
+   * @param {String} tipo
    * @returns Array de objetos TipoInstancia, filtrado por tipo
    */
   filtrarTiposDeInstanciasPorOptimizacion(tipo) {
@@ -365,16 +386,13 @@ class Sistema {
   }
 
   /**
-   * 
+   *
    * @returns Array de alquileres del usuario actual
    */
-  alquileresDeUsuarioActual()
-  {
+  alquileresDeUsuarioActual() {
     return this.usuarioActual.alquileres;
   }
 
-
-  
   crearInstancia(costoEncendido, costoAlquiler, tamanio, tipo, stockInicial) {
     let tipoInstancia = new TipoInstancia(
       costoEncendido,
@@ -385,24 +403,116 @@ class Sistema {
     );
     this.tiposDeInstanciasDisponibles.push(tipoInstancia);
   }
-  
+
+  modificarStock(id_instancia, nuevoStock) {
+    let instancia = this.buscarInstanciaporID(id_instancia);
+    if (!instancia) return;
+    if (isNaN(nuevoStock)) return;
+    let cantidadAlquiladas =
+      this.buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia);
+    if (cantidadAlquiladas > nuevoStock) return;
+    return (instancia.stockActual = nuevoStock);
+  }
+
+  buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia) {
+    let cantidadAlquiladas = 0;
+
+    for (i = 0; this.alquileres.length > i; i++) {
+      if (this.alquileres[i].idInstancia == id_instancia) {
+        cantidadAlquiladas++;
+      }
+    }
+    return cantidadAlquiladas;
+  }
+
+  obtenerGananciaTotalPorTipoInstancia(id_instancia) {
+    let alquileres = this.alquileres;
+    let total = 0;
+    for (i = 0; alquileres.length > i; i++) {
+      if (alquileres[i].idInstancia === id_instancia) {
+        total += this.obtenerGananciaPorAlquiler(alquileres[i]);
+      }
+    }
+    return total;
+  }
+
+  obtenerGananciaPorAlquiler(alquiler) {
+    let tipoInstancia = this.buscarInstanciaporID(alquiler.idInstancia);
+    return (
+      tipoInstancia.costoAlquiler +
+      (alquiler.encendidos - 1) * tipoInstancia.costoEncendido
+    );
+  }
+
+  obtenerGananciaTotal() {
+    let montoTotal = 0;
+    for(let i = 0; i < this.tiposDeInstanciasDisponibles; i++)
+    {
+      montoTotal += this.tiposDeInstanciasDisponibles[i].costoAlquiler;
+    }
+    return montoTotal;
+  }
+
+  calcularIniciosDeAlquiler() {
+    return 0
+  }
+
   preCargarDatos() {
     //this.precargarInstancias()
     //carga de tipos distintos de optimizacion
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_ALMACENAMIENTO, "Optimizada para almacenamiento"));
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo"));
-    this.optimizaciones.push(new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria"));
+    this.optimizaciones.push(
+      new Optimizacion(
+        OPTIMIZADA_ALMACENAMIENTO,
+        "Optimizada para almacenamiento"
+      )
+    );
+    this.optimizaciones.push(
+      new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo")
+    );
+    this.optimizaciones.push(
+      new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria")
+    );
     //carga de instancias optimizadas para computo
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10)
+    );
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10)
+    );
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10)
+    );
     //carga de instancias optimizadas para memoria
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10)
+    );
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10)
+    );
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10)
+    );
     //carga de instancias optimizadas para almacenamiento
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
-    this.tiposDeInstanciasDisponibles.push(new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10, 10));
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(
+        10,
+        100,
+        TAMANIO_MEDIO,
+        OPTIMIZADA_ALMACENAMIENTO,
+        10,
+        10
+      )
+    );
+    this.tiposDeInstanciasDisponibles.push(
+      new TipoInstancia(
+        10,
+        100,
+        TAMANIO_GRANDE,
+        OPTIMIZADA_ALMACENAMIENTO,
+        10,
+        10
+      )
+    );
 
     //carga de usuario admin
     this.crearUsuario("Admin", "Admin", "admin", "admin");
@@ -467,13 +577,13 @@ class TipoInstancia {
 class Alquiler {
   /**
    *
-   * @param {TipoInstancia} TipoInstancia
    * @param {Number} idUsuario
+   * @param {String} idInstancia
    */
-  constructor(idUsuario, instancia) {
+  constructor(idUsuario, idInstancia) {
     this.idUsuario = idUsuario;
     this.idAlquiler = idAlquiler++;
-    this.instancia = instancia;
+    this.idInstancia = idInstancia;
     this.encendidos = 1;
     this.encendido = true;
   }
@@ -489,14 +599,13 @@ class Alquiler {
 }
 
 /**
- * Esta clase es bastante auxiliar, pero no quiero usar arrays asociativos 
+ * Esta clase es bastante auxiliar, pero no quiero usar arrays asociativos
  * Los arrays de arrays fueron una buena idea, pero esto va a ser la posta
  */
-class Optimizacion
-{
-  constructor(prefijo, texto)
-  {
+class Optimizacion {
+  constructor(prefijo, texto) {
     this.prefijo = prefijo;
     this.texto = texto;
   }
 }
+
