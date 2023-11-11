@@ -206,9 +206,6 @@
         style="display: none"
       >
         <h3>Visualizacion de instancias alquiladas</h3>
-        <select id="slcFiltroTablaInstancias">
-          <option value="-1">Todas las instancias</option>
-        </select>
         <br />
         <br />
         <div style="display: flex; justify-content: center">
@@ -221,13 +218,7 @@
                 <th>Apagar/Encender</th>
               </tr>
             </thead>
-            <tbody id="tablaListadoDeInstancias">
-              <tr>
-                <td>c7.small</td>
-                <td>Activa</td>
-                <td>1</td>
-                <td><button>Apagar</button></td>
-              </tr>
+            <tbody id="tablaListadoDeInstanciasUsuario">
             </tbody>
           </table>
         </div>
@@ -241,7 +232,7 @@
         style="display: none"
       >
         <h3>Visualizacion de costos acumulados</h3>
-        <table border="4" id="tableCostosAcumulados">
+        <table border="4">
           <thead>
             <tr>
               <th>Tipo de instancia</th>
@@ -250,7 +241,13 @@
               <th>Costo total</th>
             </tr>
           </thead>
+          <tbody id="tableCostosAcumulados">
+
+          </tbody>
         </table>
+        <br>
+        <br>
+        <p id="costoTotalInstancias"></p>
       </div>
       <!--Fin de seccion de totales a pagar por cada instancia-->
 

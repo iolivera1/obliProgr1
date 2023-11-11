@@ -370,23 +370,6 @@ class Sistema {
 
   /**
    *
-   * @param {Number} id
-   * @returns un objeto de la clase Usuarios, si lo encuentra; null en otro caso
-   */
-  buscarInstanciaporID(id) {
-    let encontrada = null;
-    let i = 0;
-    while (i < this.tiposDeInstanciasDisponibles.length && !encontrada) {
-      if (this.tiposDeInstanciasDisponibles[i].id === id) {
-        encontrada = this.tiposDeInstanciasDisponibles[i];
-      }
-      i++;
-    }
-    return encontrada;
-  }
-
-  /**
-   *
    * @returns Array de alquileres del usuario actual
    */
   alquileresDeUsuarioActual() {
@@ -404,6 +387,31 @@ class Sistema {
     this.tiposDeInstanciasDisponibles.push(tipoInstancia);
   }
 
+  obtenerInstanciasPorUsuario(idUsuario) {
+    const instanciasAlquiladas = [];
+
+    for (let i = 0; i < this.alquileres.length; i++) {
+      const alquiler = this.alquileres[i];
+      if (alquiler.idUsuario === idUsuario && alquiler.encendido) {
+        const instancia = this.buscarInstanciaporID(alquiler.idInstancia);
+        if (instancia) {
+          instanciasAlquiladas.push(instancia);
+        }
+      }
+    }
+    return instanciasAlquiladas;
+  }
+
+  obtenerEstadoAlquiler(idInstancia) {
+    const alquiler = this.alquileres.find((alq) => alq.idInstancia === idInstancia);
+
+    if (alquiler) {
+      return alquiler.encendido ? INSTANCIA_ENCENDIDA : INSTANCIA_APAGADA;
+    } else {
+      return MENSAJE_INSTANCIA_INCORRECTA;
+    }
+  }
+
   modificarStock(id_instancia, nuevoStock) {
     let instancia = this.buscarInstanciaporID(id_instancia);
     if (!instancia) return;
@@ -412,6 +420,11 @@ class Sistema {
       this.buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia);
     if (cantidadAlquiladas > nuevoStock) return;
     return (instancia.stockActual = nuevoStock);
+  }
+
+  obtenerStockActual(id_instancia) {
+    let instancia = this.buscarInstanciaporID(id_instancia);
+    return instancia ? instancia.stockActual : null;
   }
 
   buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia) {
@@ -438,28 +451,51 @@ class Sistema {
 
   obtenerGananciaPorAlquiler(alquiler) {
     let tipoInstancia = this.buscarInstanciaporID(alquiler.idInstancia);
+        
     return (
-      tipoInstancia.costoAlquiler +
-      (alquiler.encendidos - 1) * tipoInstancia.costoEncendido
+      tipoInstancia.costoPorAlquiler +
+      (alquiler.encendidos - 1) * tipoInstancia.costoPorEncendido
     );
   }
 
   obtenerGananciaTotal() {
     let montoTotal = 0;
-    for(let i = 0; i < this.tiposDeInstanciasDisponibles; i++)
-    {
-      montoTotal += this.tiposDeInstanciasDisponibles[i].costoAlquiler;
+    for (let i = 0; i < this.tiposDeInstanciasDisponibles.length; i++) {
+        montoTotal += this.obtenerGananciaTotalPorTipoInstancia(this.tiposDeInstanciasDisponibles[i].id);
     }
     return montoTotal;
-  }
+}
 
-  calcularIniciosDeAlquiler() {
-    return 0
+  calcularIniciosDeAlquiler(idInstancia) {
+    let totalInicios = 0;
+
+    for (let i = 0; i < this.alquileres.length; i++) {
+      if (this.alquileres[i].idInstancia === idInstancia) {
+        totalInicios += this.alquileres[i].encendidos;
+      }
+    }
+
+    return totalInicios;
+  }
+  
+  /**
+   *
+   * @param {Number} id
+   * @returns un objeto de la clase Usuarios, si lo encuentra; null en otro caso
+   */
+  buscarInstanciaporID(id) {
+    let encontrada = null;
+    let i = 0;
+    while (i < this.tiposDeInstanciasDisponibles.length && !encontrada) {
+      if (this.tiposDeInstanciasDisponibles[i].id === id) {
+        encontrada = this.tiposDeInstanciasDisponibles[i];
+      }
+      i++;
+    }
+    return encontrada;
   }
 
   preCargarDatos() {
-    //this.precargarInstancias()
-    //carga de tipos distintos de optimizacion
     this.optimizaciones.push(
       new Optimizacion(
         OPTIMIZADA_ALMACENAMIENTO,
@@ -608,4 +644,3 @@ class Optimizacion {
     this.texto = texto;
   }
 }
-

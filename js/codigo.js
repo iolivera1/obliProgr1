@@ -293,6 +293,8 @@ function alquilarMaquinaVirtual() {
   document.querySelector("#slcTipoInstancia").value = "-1";
   document.querySelector("#slcTipoOptimizacion").value = "-1";
   actualizarTablaInstancias();
+  actualizarTablaInstanciasUsuario();
+  actualizarTablaCostosUsuario();
   return mensajeAlquiler === ALQUILER_EXITOSO;
 }
 
@@ -326,6 +328,8 @@ function login() {
     } else {
       mostrarPagina("#divAlquilerDeInstancias");
       document.querySelector("#cabezalUser").style.display = "block";
+      actualizarTablaInstanciasUsuario();
+      actualizarTablaCostosUsuario();
     }
   }
   usuario.value = "";
@@ -372,12 +376,10 @@ function actualizarTablaUsuario() {
   actualizarEventosBotonesTabla();
 }
 
-actualizarTablaUsuario(); // el profe dijo que lo dejemos asi (?
+actualizarTablaUsuario();
 
-//ojo! no podemos usar forEach
 function actualizarEventosBotonesTabla() {
   let botones = document.querySelectorAll(".btnAlternarEstadoUsuario");
-
   for (let i = 0; i < botones.length; i++) {
     botones[i].addEventListener("click", actualizarEstadoUsuario);
   }
@@ -385,7 +387,7 @@ function actualizarEventosBotonesTabla() {
 
 function actualizarEstadoUsuario() {
   const idUsuario = Number(this.value);
-
+  
   let usuario = sistema.encontrarUsuarioPorId(idUsuario);
 
   if (
@@ -396,27 +398,31 @@ function actualizarEstadoUsuario() {
   } else {
     usuario.estado = ESTADO_BLOQUEADO;
   }
-
   actualizarTablaUsuario();
 }
+
 
 function actualizarTablaInstancias() {
   let tablaBody = document.querySelector("#tableListadoInstancias");
   let instancias = sistema.tiposDeInstanciasDisponibles;
   let resultado = "";
   instancias.forEach((instancia) => {
-    resultado += `<tr><td>${instancia.tipo + '.' + instancia.tamanio}</td><td>${
-      sistema.calcularIniciosDeAlquiler(instancia.id)
-    }</td>
-    <td>${instancia.stockActual - sistema.buscarCantidadMaquinasAlquiladasPorIdInstancia(instancia.id)}</td>
-    <td>${instancia.stockActual}</td>
+    resultado += `
+    <tr>
+    <td>${instancia.tipo + "." + instancia.tamanio}</td>
+    <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
+    <td>${sistema.obtenerStockActual(instancia.id)}</td>
     <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
     ></tr>`;
   });
   tablaBody.innerHTML = resultado;
 
-  document.querySelector('#ingresoTotalInstancias').innerHTML = sistema.obtenerGananciaTotal();
+  document.querySelector(
+    "#ingresoTotalInstancias"
+  ).innerHTML = `La ganancia total es: ${sistema.obtenerGananciaTotal()}`;
 }
+
+actualizarTablaInstancias();
 
 function mostrarStockInstanciaSeleccionada() {
   const id_instancia = this.value;
@@ -430,7 +436,52 @@ function mostrarStockInstanciaSeleccionada() {
 
 function modificarStock() {
   const id_instancia = document.querySelector("#slcStockInstancia").value;
-  const nuevoStock = Number(document.querySelector('#txtNuevoStockIngresado').value)
+  const nuevoStock = Number(
+    document.querySelector("#txtNuevoStockIngresado").value
+  );
   sistema.modificarStock(id_instancia, nuevoStock);
 }
 
+function actualizarTablaInstanciasUsuario() {
+  let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
+  let instancias = sistema.obtenerInstanciasPorUsuario(
+    sistema.usuarioActual.id
+  );
+  let resultado = "";
+  instancias.forEach((instancia) => {
+    resultado += `
+      <tr>
+        <td>${instancia.tipo + "." + instancia.tamanio}</td>
+        <td>${sistema.obtenerEstadoAlquiler(instancia.id)}</td>
+        <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
+        <td><button id=${instancia.id}>${
+      sistema.obtenerEstadoAlquiler(instancia.id) ? "apagar" : "encender"
+    }</button></td>
+      </tr>`;
+  });
+
+  tablaBody.innerHTML = resultado;
+}
+
+function actualizarTablaCostosUsuario() {
+  if (!sistema.usuarioActual) return;
+  let tablaBody = document.querySelector("#tableCostosAcumulados");
+  let instancias = sistema.obtenerInstanciasPorUsuario(
+    sistema.usuarioActual.id
+  );
+  let resultado = "";
+  instancias.forEach((instancia) => {
+    resultado += `
+    <tr>
+    <td>${instancia.tipo + "." + instancia.tamanio}</td>
+    <td>${instancia.costoPorEncendido}</td>
+    <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
+    <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
+    ></tr>`;
+  });
+  tablaBody.innerHTML = resultado;
+
+  document.querySelector(
+    "#costoTotalInstancias"
+  ).innerHTML = `El costo total es: ${sistema.obtenerGananciaTotal()}`;
+}
