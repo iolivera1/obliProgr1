@@ -484,4 +484,6 @@ function actualizarTablaCostosUsuario() {
   document.querySelector(
     "#costoTotalInstancias"
   ).innerHTML = `El costo total es: ${sistema.obtenerGananciaTotal()}`;
+
+  
 }
