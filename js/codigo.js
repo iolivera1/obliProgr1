@@ -38,9 +38,6 @@ document
 document
   .querySelector("#btnAlquilarVM")
   .addEventListener("click", alquilarMaquinaVirtual);
-document
-  .querySelector("#btnVerListadoAlquileres")
-  .addEventListener("click", verAlquileresDeInstancias);
 
 //fin eventos fijos
 
@@ -344,20 +341,20 @@ function logout() {
 }
 
 function verAlquileresDeInstancias() {
-  document.querySelector("#tablaListadoDeInstancias").innerHTML = ``;
+  document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML = ``;
   let alquileres = sistema.alquileresDeUsuarioActual();
   if (!alquileres.length) return;
 
   let tablaBody = ``;
   for (let i = 0; i < alquileres.length; i++) {
     let alquiler = alquileres[i];
-    let instancia = alquiler.instancia;
+    let instancia = sistema.buscarInstanciaporID(alquiler.idInstancia);
     let estado = alquiler.estado ? INSTANCIA_ENCENDIDA : INSTANCIA_ENCENDIDA;
     let fila = `<tr><td>${instancia.tipo}</td> <td>${estado}</td> <td>${alquiler.encendidos}</td> <td>boton</td></tr>`;
     tablaBody += fila;
   }
 
-  document.querySelector("#tablaListadoDeInstancias").innerHTML = tablaBody;
+  document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML = tablaBody;
   mostrarPagina("#divListadoDeInstancias");
 }
 function actualizarTablaUsuario() {
@@ -444,23 +441,39 @@ function modificarStock() {
 
 function actualizarTablaInstanciasUsuario() {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
-  let instancias = sistema.obtenerInstanciasPorUsuario(
-    sistema.usuarioActual.id
-  );
+  let instancias = sistema.obtenerInstanciasPorUsuario(sistema.usuarioActual.id);
   let resultado = "";
   instancias.forEach((instancia) => {
+    let textoBoton = sistema.obtenerEstadoAlquiler(instancia.id) === INSTANCIA_ENCENDIDA ? "apagar" : "encender"
     resultado += `
       <tr>
         <td>${instancia.tipo + "." + instancia.tamanio}</td>
         <td>${sistema.obtenerEstadoAlquiler(instancia.id)}</td>
         <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
-        <td><button id=${instancia.id}>${
-      sistema.obtenerEstadoAlquiler(instancia.id) ? "apagar" : "encender"
-    }</button></td>
+        <td><button class="btnCambiarEstadoInstancia" value="${instancia.id}">${textoBoton}</button>
+        </td>
       </tr>`;
-  });
+    });
 
   tablaBody.innerHTML = resultado;
+  agregarFuncionalidadBotonesInstancias();
+}
+
+function agregarFuncionalidadBotonesInstancias()
+{
+  let botones = document.querySelectorAll(".btnCambiarEstadoInstancia");
+  for(let i = 0; i < botones.length; i++)
+  {
+    botones[i].addEventListener("click", cambiarEstadoDeInstanciaAlquilada);
+  }
+}
+
+function cambiarEstadoDeInstanciaAlquilada()
+{
+  let idInstancia = this.value;
+  let alquiler = sistema.buscarAlquilerPorIDInstancia(idInstancia);
+  sistema.cambiarEstadoDeAlquiler(alquiler);
+  actualizarTablaInstanciasUsuario();
 }
 
 function actualizarTablaCostosUsuario() {

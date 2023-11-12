@@ -1,7 +1,6 @@
 const WARNING_ICON = `<img src="img/warning.webp" height="25px" alt="Advertencia">`;
 const DENIED_ICON = `<img src="img/error.webp" height="25px" alt="Denegado">`;
 const APPROVED_ICON = `<img src="img/approved.webp" height="25px" alt="Aprobado">`;
-const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
 
 const ERROR_REGISTRO_NOMBRE_APELLIDO = `${DENIED_ICON} El nombre y el apellido no pueden estar vacios<br>`;
 const ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO = `${DENIED_ICON} El nombre de usuario debe tener entre 4 y 20 caracteres. No puede ser un numero <br>`;
@@ -23,7 +22,7 @@ const TAMANIO_GRANDE = "large";
 
 const MENSAJE_INSTANCIA_INCORRECTA = "Tipo de instancia incorrecto";
 const MENSAJE_INSTANCIA_SIN_STOCK = "No hay stock";
-const MENSAJE_INSTANCIA_OK = "OK";
+const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
 
 const INSTANCIA_ENCENDIDA = "Encendida";
 const INSTANCIA_APAGADA = "Apagada";
@@ -351,7 +350,7 @@ class Sistema {
     let nuevoAlquiler = new Alquiler(this.usuarioActual.id, id_instancia);
     this.alquileres.push(nuevoAlquiler);
     this.usuarioActual.alquileres.push(nuevoAlquiler);
-    return MENSAJE_INSTANCIA_OK;
+    return ALQUILER_EXITOSO;
   }
 
   /**Recibe tipo (puede ser c7, i7, r7)
@@ -392,7 +391,7 @@ class Sistema {
 
     for (let i = 0; i < this.alquileres.length; i++) {
       const alquiler = this.alquileres[i];
-      if (alquiler.idUsuario === idUsuario && alquiler.encendido) {
+      if (alquiler.idUsuario === idUsuario) {
         const instancia = this.buscarInstanciaporID(alquiler.idInstancia);
         if (instancia) {
           instanciasAlquiladas.push(instancia);
@@ -403,8 +402,8 @@ class Sistema {
   }
 
   obtenerEstadoAlquiler(idInstancia) {
-    const alquiler = this.alquileres.find((alq) => alq.idInstancia === idInstancia);
-
+    const alquiler = this.buscarAlquilerPorIDInstancia(idInstancia);
+    
     if (alquiler) {
       return alquiler.encendido ? INSTANCIA_ENCENDIDA : INSTANCIA_APAGADA;
     } else {
@@ -493,6 +492,30 @@ class Sistema {
       i++;
     }
     return encontrada;
+  }
+
+  buscarAlquilerPorIDInstancia(idInstancia)
+  {
+    let encontrada = null;
+    let i = 0;
+    while(i < this.alquileres.length && !encontrada)
+    {
+      encontrada = (this.alquileres[i].idInstancia === idInstancia) ? this.alquileres[i] : null;
+      i++;
+    }
+    return encontrada;
+  }
+
+  cambiarEstadoDeAlquiler(alquiler)
+  {
+    if(alquiler.encendido)
+    {
+      alquiler.apagarMaquina();
+    }
+    else
+    {
+      alquiler.encenderMaquina();
+    }
   }
 
   preCargarDatos() {
