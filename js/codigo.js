@@ -1,17 +1,13 @@
-const TEXTO_$_ALQUILER = ` - Costo por alquiler: U$S`;
-const TEXTO_$_ENCENDIDO = `<br> - costo de encendido: U$S`;
 let sistema = new Sistema();
 sistema.preCargarDatos();
 
 //eventos fijos
 
+document.querySelector("#btnLogin").addEventListener("click", login);
+
 document
   .querySelector("#btnCrearUsuario")
   .addEventListener("click", crearUsuario);
-
-document
-  .querySelector("#btnYaTengoUsuario")
-  .addEventListener("click", limpiarRegistro);
 
 document
   .querySelector("#slcTipoOptimizacion")
@@ -19,7 +15,7 @@ document
 
 document
   .querySelector("#slcStockOptimizacion")
-  .addEventListener("change", montarOpcionesStockInstancias);
+  .addEventListener("change", montarOpcionesInstancias);
 
 document
   .querySelector("#slcTipoInstancia")
@@ -28,8 +24,6 @@ document
 document
   .querySelector("#slcStockInstancia")
   .addEventListener("change", mostrarStockInstanciaSeleccionada);
-
-document.querySelector("#btnLogin").addEventListener("click", login);
 
 document
   .querySelector("#btnModificarStock")
@@ -45,21 +39,8 @@ habilitarNavegacion();
 mostrarPagina("#divLoginUsuario");
 cargarOptimizaciones("#slcTipoOptimizacion");
 cargarOptimizaciones("#slcStockOptimizacion");
+agregarLogOuts();
 
-/**
- * Limpia la seccion de registro al cambiar de pagina
- */
-function limpiarRegistro() {
-  document.querySelector("#txtNombreRegisto").value = ``;
-  document.querySelector("#txtApellidoRegisto").value = ``;
-  document.querySelector("#txtUsernameRegistro").value = ``;
-  document.querySelector("#txtContraseniaRegistro").value = ``;
-  document.querySelector("#txtContraseniaRepeticionRegistro").value = ``;
-  document.querySelector("#txtTarjetaCreditoNumero").value = ``;
-  document.querySelector("#txtCVC").value = ``;
-  document.querySelector("#pMsjRegistroUsuario").innerHTML = ``;
-  document.querySelector("#divRegistroFormaDePago").style.display = "none";
-}
 
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
@@ -78,6 +59,7 @@ function habilitarNavegacion() {
 function navegar() {
   let boton = this;
   let idDivMostrar = "#" + boton.getAttribute("data-mostrar");
+  limpiarCampos(idDivMostrar);
   mostrarPagina(idDivMostrar);
 }
 
@@ -101,9 +83,10 @@ function agregarLogOuts() {
     boton.addEventListener("click", logout);
   });
 }
-agregarLogOuts();
+
 /**
  * Validacion del registro de usuario, chequea nombre de usuario, contrasenia y forma de pago
+ * Si se validan los datos y la forma de pago, se crea el usuario
  */
 function crearUsuario() {
   let nombre = document.querySelector("#txtNombreRegisto").value;
@@ -118,22 +101,12 @@ function crearUsuario() {
   ).value;
   let cvc = document.querySelector("#txtCVC").value;
 
-  if (
-    !datosDeRegistroSonValidos(
-      nombre,
-      apellido,
-      userName,
-      contrasenia,
-      repeticionContrasenia
-    )
-  )
-    return;
+  if (!datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia)) return;
 
   document.querySelector("#divRegistroFormaDePago").style.display = "block";
   if (!formaDePagoEsValida(nroTarjetaCredito, cvc)) return;
 
-  document.querySelector("#pMsjRegistroUsuario").innerHTML =
-    MENSAJE_USUARIO_CREADO_CORRECTAMENTE;
+  document.querySelector("#pMsjRegistroUsuario").innerHTML = MENSAJE_USUARIO_CREADO_CORRECTAMENTE;
   sistema.crearUsuario(nombre, apellido, userName, contrasenia);
 
   actualizarTablaUsuario();
@@ -148,20 +121,9 @@ function crearUsuario() {
  * @param {String} repeticionContrasenia
  * @returns true si no hay mensajes de error para mostrar; false en otro caso
  */
-function datosDeRegistroSonValidos(
-  nombre,
-  apellido,
-  userName,
-  contrasenia,
-  repeticionContrasenia
-) {
-  let msjError = sistema.validarDatosRegistro(
-    nombre,
-    apellido,
-    userName,
-    contrasenia,
-    repeticionContrasenia
-  );
+function datosDeRegistroSonValidos(nombre, apellido, userName, contrasenia, repeticionContrasenia) 
+{
+  let msjError = sistema.validarDatosRegistro(nombre, apellido, userName, contrasenia, repeticionContrasenia);
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
 
@@ -176,16 +138,13 @@ function datosDeRegistroSonValidos(
  *
  * @param {Number} nroTarjetaCredito
  * @param {Number} cvc
- * @returns  true si la tarjeta es valida (segun algoritmo de Luhn)
+ * @returns  true si la tarjeta es valida (segun validacion de sistema)
  */
-function formaDePagoEsValida(nroTarjetaCredito, cvc) {
-  if (!nroTarjetaCredito || !cvc) return false;
+function formaDePagoEsValida(nroTarjetaCredito, cvc) 
+{
 
-  let msjError = ``;
-  if (!sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc)) {
-    msjError = `${WARNING_ICON} La forma de pago ingresada no es valida`;
-  }
-
+  let msjError = sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc);
+  
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
 
   if (msjError.length > 0) {
@@ -199,20 +158,28 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
  * En la seccion alquiler, carga el segundo combo box dinamicamente usando el value del primer combo box
  * this seria en este contexto, el elemento <option> seleccionado en el primer select
  */
-function montarOpcionesInstancias() {
-  document.querySelector("#pMsjAlquilerInstancias").innerHTML = `<br><br>`;
+function montarOpcionesInstancias() 
+{
+  let idMsj = "#pMsjAlquilerInstancias";
+  let idDiv = "#divTipoDeInstancia";
+  let idSelect = "#slcTipoInstancia";
+  if(sistema.esUsuarioAdmin(sistema.usuarioActual))
+  {
+    idMsj = "#pMsjStockInstancias";
+    idDiv = "#divStockTipoDeInstancia";
+    idSelect = "#slcStockInstancia";
+  }
+  document.querySelector(idMsj).innerHTML = `<br><br>`;
 
   let opcionSelect = this.value;
-  let divSelect = document.querySelector("#divTipoDeInstancia");
-  document.querySelector("#pErrorAlquiler").innerHTML = ``;
+  let divSelect = document.querySelector(idDiv);
 
-  if (opcionSelect == -1) {
-    document.querySelector(
-      "#pMsjAlquilerInstancias"
-    ).innerHTML = `${DENIED_ICON} Seleccione una opción`;
+  if (opcionSelect == -1) 
+  {
+    document.querySelector(idMsj).innerHTML = MENSAJE_OPCION_INSTANCIA_SELECCIONADA;
     divSelect.style.display = "none";
   } else {
-    cargarSelect(opcionSelect, "#slcTipoInstancia");
+    cargarSelect(opcionSelect, idSelect);
     divSelect.style.display = "block";
   }
 }
@@ -223,10 +190,9 @@ function montarOpcionesStockInstancias() {
   let opcionSelect = this.value;
   let divSelect = document.querySelector("#divStockTipoDeInstancia");
 
-  if (opcionSelect == -1) {
-    document.querySelector(
-      "#pMsjStockInstancias"
-    ).innerHTML = `${DENIED_ICON} Seleccione una opción`;
+  if (opcionSelect == -1) 
+  {
+    document.querySelector("#pMsjStockInstancias").innerHTML = MENSAJE_OPCION_INSTANCIA_SELECCIONADA;
     divSelect.style.display = "none";
   } else {
     cargarSelect(opcionSelect, "#slcStockInstancia");
@@ -272,7 +238,7 @@ function mostrarPrecioInstanciaSeleccionada() {
 
   let msjPrecio =
     TEXTO_$_ALQUILER +
-    `<b>U$S${instanciaSeleccionada.costoPorAlquiler}</b>` +
+    `<b>${instanciaSeleccionada.costoPorAlquiler}</b>` +
     TEXTO_$_ENCENDIDO +
     `<b>${instanciaSeleccionada.costoPorEncendido}</b>`;
 
@@ -280,57 +246,58 @@ function mostrarPrecioInstanciaSeleccionada() {
 }
 
 /** Crea un alquiler, si puede; muestra mensaje de resultado en pantalla
- *
- * @returns true si puede crear un alquiler y asociarlo al usuario, false en otro caso
+ *  El mensaje puede ser de error o de exito
  */
 function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
   let mensajeAlquiler = sistema.crearAlquilerDeInstancia(opcionSelecionada);
+  limpiarCampos('#divAlquilerDeInstancias');
+  if(mensajeAlquiler === ALQUILER_EXITOSO)
+  {
+    actualizarTablaInstancias();
+    actualizarTablaInstanciasUsuario();
+    actualizarTablaCostosUsuario();
+    document.querySelector("#divTipoDeInstancia").style.display = 'none';
+  }
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = mensajeAlquiler;
-  document.querySelector("#slcTipoInstancia").value = "-1";
-  document.querySelector("#slcTipoOptimizacion").value = "-1";
-  actualizarTablaInstancias();
-  actualizarTablaInstanciasUsuario();
-  actualizarTablaCostosUsuario();
-  return mensajeAlquiler === ALQUILER_EXITOSO;
 }
 
 /**
  * Lleva a cabo el login de usuario, muestra un mensaje de error si no logra hacer el login
- * si logra el login muestra la pantalla de alquiler
  */
 function login() {
-  let usuario = document.querySelector("#txtUsernameoLogin");
-  let contraseña = document.querySelector("#txtContraseniaLogin");
+  let usuario = document.querySelector("#txtUsernameoLogin").value;
+  let contraseña = document.querySelector("#txtContraseniaLogin").value;
   document.querySelector("#pErrorLogin").innerHTML = ``;
 
-  if (sistema.login(usuario.value, contraseña.value) === false) {
-    document.querySelector(
-      "#pErrorLogin"
-    ).innerHTML = `${DENIED_ICON} La combinacion de usuario y contraseña no son correctas`;
-  } else {
-    if (
-      sistema.usuarioActual.estado == ESTADO_PENDIENTE ||
-      sistema.usuarioActual.estado == ESTADO_BLOQUEADO
-    ) {
-      document.querySelector(
-        "#pErrorLogin"
-      ).innerHTML = `${DENIED_ICON} El usuario necesita ser habilitado`;
-      return;
-    }
-
-    if (sistema.esUsuarioAdmin(sistema.usuarioActual)) {
-      mostrarPagina("#divListadoUsuarios");
-      document.querySelector("#cabezalAdmin").style.display = "block";
-    } else {
-      mostrarPagina("#divAlquilerDeInstancias");
-      document.querySelector("#cabezalUser").style.display = "block";
-      actualizarTablaInstanciasUsuario();
-      actualizarTablaCostosUsuario();
-    }
+  let errorLogin = sistema.login(usuario, contraseña);
+  if(errorLogin)
+  {
+    document.querySelector("#pErrorLogin").innerHTML = errorLogin;
+    return;
   }
-  usuario.value = "";
-  contraseña.value = "";
+  limpiarCampos("#divLoginUsuario");
+  mostarPrimeraPagina();
+}
+
+/**
+ * Luego de realizado el login, se debe mostrar contenido dependiendo del rol del user actual
+ */
+function mostarPrimeraPagina()
+{
+  let usuarioActualEsAdmin = sistema.esUsuarioAdmin(sistema.usuarioActual);
+  if(usuarioActualEsAdmin)
+  {
+    mostrarPagina("#divListadoUsuarios");
+    document.querySelector("#cabezalAdmin").style.display = "block";
+  }
+  else
+  {
+    mostrarPagina("#divAlquilerDeInstancias");
+    document.querySelector("#cabezalUser").style.display = "block";
+    actualizarTablaInstanciasUsuario();
+    actualizarTablaCostosUsuario();
+  }
 }
 
 function logout() {
@@ -353,21 +320,22 @@ function verAlquileresDeInstancias() {
     let fila = `<tr><td>${instancia.tipo}</td> <td>${estado}</td> <td>${alquiler.encendidos}</td> <td>boton</td></tr>`;
     tablaBody += fila;
   }
-
   document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML = tablaBody;
   mostrarPagina("#divListadoDeInstancias");
 }
+
 function actualizarTablaUsuario() {
   let tabla = document.querySelector("#tablaUsuarios");
   let usuarios = sistema.usuarios;
   let resultado = "";
   usuarios.forEach((usuario) => {
+    let usuarioActivo = sistema.esUsuarioActivo(usuario);
     resultado += `<tr><td>${usuario.nombreUsuario}</td><td>${
       usuario.estado
     }</td><td>
-    <button class="btnAlternarEstadoUsuario" value="${usuario.id}">${
-      sistema.esUsuarioActivo(usuario) == true ? "bloquear" : "activar"
-    }</button></td></tr>`;
+    <button class="btnAlternarEstadoUsuario" value="${usuario.id}">
+    ${usuarioActivo ? "bloquear" : "activar"}
+    </button></td></tr>`;
   });
   tabla.innerHTML = resultado;
   actualizarEventosBotonesTabla();
@@ -382,19 +350,12 @@ function actualizarEventosBotonesTabla() {
   }
 }
 
+
 function actualizarEstadoUsuario() {
   const idUsuario = Number(this.value);
-  
   let usuario = sistema.encontrarUsuarioPorId(idUsuario);
-
-  if (
-    usuario.estado === ESTADO_PENDIENTE ||
-    usuario.estado === ESTADO_BLOQUEADO
-  ) {
-    usuario.estado = ESTADO_ACTIVO;
-  } else {
-    usuario.estado = ESTADO_BLOQUEADO;
-  }
+  if(!usuario) return;
+  sistema.cambiarEstadoDeUsuario(usuario);
   actualizarTablaUsuario();
 }
 
@@ -433,10 +394,10 @@ function mostrarStockInstanciaSeleccionada() {
 
 function modificarStock() {
   const id_instancia = document.querySelector("#slcStockInstancia").value;
-  const nuevoStock = Number(
-    document.querySelector("#txtNuevoStockIngresado").value
-  );
-  sistema.modificarStock(id_instancia, nuevoStock);
+  const nuevoStock = Number(document.querySelector("#txtNuevoStockIngresado").value);
+  let mensaje = sistema.modificarStock(id_instancia, nuevoStock);
+  document.querySelector("#pMsjStockInstancias").innerHTML = mensaje;
+  actualizarTablaInstancias();
 }
 
 function actualizarTablaInstanciasUsuario() {
@@ -477,12 +438,11 @@ function cambiarEstadoDeInstanciaAlquilada()
 }
 
 function actualizarTablaCostosUsuario() {
-  if (!sistema.usuarioActual) return;
+  let usuario = sistema.usuarioActual;
+  if (!usuario) return;
   let tablaBody = document.querySelector("#tableCostosAcumulados");
-  let instancias = sistema.obtenerInstanciasPorUsuario(
-    sistema.usuarioActual.id
-  );
-  let resultado = "";
+  let instancias = sistema.obtenerInstanciasPorUsuario(usuario.id);
+  let resultado = ``;
   instancias.forEach((instancia) => {
     resultado += `
     <tr>
@@ -494,9 +454,31 @@ function actualizarTablaCostosUsuario() {
   });
   tablaBody.innerHTML = resultado;
 
-  document.querySelector(
-    "#costoTotalInstancias"
-  ).innerHTML = `El costo total es: ${sistema.obtenerGananciaTotal()}`;
+  document.querySelector("#costoTotalInstancias").innerHTML = 
+  `El costo total es: ${sistema.obtenerGananciaTotal()}`;
 
-  
+}
+
+/** Limpia todos los inputs, selects y parrafos de un div
+ * 
+ * @param {String} idDiv 
+ */
+function limpiarCampos(idDiv)
+{
+  let div = document.querySelector(idDiv);
+  let campos = div.querySelectorAll('input, p, select');
+  for(let i = 0; i < campos.length; i++)
+  {
+    switch(campos[i].tagName)
+    {
+      case 'INPUT':
+        campos[i].value = ``;
+        break;
+      case 'SELECT':
+        campos[i].value = '-1';
+        break;
+      case 'P':
+        campos[i].innerHTML = ``;
+    }
+  }
 }

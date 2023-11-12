@@ -149,7 +149,7 @@
           style="display: none"
         >
           <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
-          <input type="text" id="txtTarjetaCreditoNumero" />
+          <input type="text" id="txtTarjetaCreditoNumero" value="4485746493384014"/>
           <br />
           <label for="txtCVC">CVC:</label>
           <input type="text" id="txtCVC" />
@@ -183,15 +183,11 @@
         <div id="divTipoDeInstancia" style="display: none">
           <label for="slcTipoInstancia">Seleccione una instancia</label>
           <select id="slcTipoInstancia"></select>
-          <br />
+        </div>
           <br />
           <button id="btnAlquilarVM">Alquilar instancia</button>
           <br />
           <p id="pMsjAlquilerInstancias"></p>
-        </div>
-
-        <br />
-        <p id="pErrorAlquiler"></p>
       </div>
       <!--Fin seccion de alquiler de una instancia-->
 
@@ -333,7 +329,9 @@
             <tbody id="tableListadoInstancias"></tbody>
           </table>
         </div>
-        <p id="ingresoTotalInstancias"></p>
+        <div>
+          <p id="ingresoTotalInstancias"></p>
+        </div>
       </div>
       <!--Fin de tabla de informe de instancias-->
     </div>
