@@ -31,7 +31,7 @@ const TAMANIO_GRANDE = "large";
 const MENSAJE_OPCION_INSTANCIA_SELECCIONADA = `${DENIED_ICON} Seleccione una opción`;
 const MENSAJE_INSTANCIA_INCORRECTA = "Tipo de instancia incorrecto";
 const MENSAJE_INSTANCIA_SIN_STOCK = "No hay stock";
-const ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
+const MENSAJE_ALQUILER_EXITOSO = `${APPROVED_ICON} Alquiler de instancia exitoso`;
 
 const MENSAJE_STOCK_INVALIDO = `${DENIED_ICON} El stock debe ser un numero positivo`;
 const MENSAJE_STOCK_MENOR_AL_TOPE = `${DENIED_ICON} El stock no puede ser menor que las instancias ya alquiladas`;
@@ -45,6 +45,7 @@ const INSTANCIA_APAGADA = "Apagada";
 let idTipoInstancia = 0;
 let idUsuario = 0;
 let idAlquiler = 0;
+let gananciasTotales = 0;
 
 class Sistema {
   constructor() {
@@ -351,11 +352,12 @@ class Sistema {
   }
 
   /** Valida stock antes de crear un alquiler
+   *  Si hay stock, crea un alquiler y lo asocia al usuario
    *
-   * @param {String} id_instancia
+   * @param {String} idInstancia
    */
-  crearAlquilerDeInstancia(id_instancia) {
-    let instancia = this.buscarInstanciaporID(id_instancia);
+  crearAlquilerDeInstancia(usuario, idInstancia) {
+    let instancia = this.buscarInstanciaporID(idInstancia);
     if (!instancia) {
       return MENSAJE_INSTANCIA_INCORRECTA;
     }
@@ -363,10 +365,10 @@ class Sistema {
       return MENSAJE_INSTANCIA_SIN_STOCK;
     }
     instancia.stockActual--;
-    let nuevoAlquiler = new Alquiler(this.usuarioActual.id, id_instancia);
+    let nuevoAlquiler = new Alquiler(usuario.id, idInstancia);
     this.alquileres.push(nuevoAlquiler);
-    this.usuarioActual.alquileres.push(nuevoAlquiler);
-    return ALQUILER_EXITOSO;
+    usuario.alquileres.push(nuevoAlquiler);
+    return MENSAJE_ALQUILER_EXITOSO;
   }
 
   /**Recibe tipo (puede ser c7, i7, r7)
@@ -391,15 +393,20 @@ class Sistema {
     return this.usuarioActual.alquileres;
   }
 
-  crearInstancia(costoEncendido, costoAlquiler, tamanio, tipo, stockInicial) {
+  crearInstancia(costoAlquiler, costoEncendido, tamanio, tipo, stockInicial) {
     let tipoInstancia = new TipoInstancia(
-      costoEncendido,
       costoAlquiler,
+      costoEncendido,
       tamanio,
       tipo,
       stockInicial
     );
     this.tiposDeInstanciasDisponibles.push(tipoInstancia);
+  }
+  crearOptimizacion(prefijo, texto)
+  {
+    let optimizacion = new Optimizacion(prefijo, texto);
+    this.optimizaciones.push(optimizacion);
   }
 
   obtenerInstanciasPorUsuario(idUsuario) {
@@ -489,15 +496,9 @@ class Sistema {
 }
 
   calcularIniciosDeAlquiler(idInstancia) {
-    let totalInicios = 0;
-
-    for (let i = 0; i < this.alquileres.length; i++) {
-      if (this.alquileres[i].idInstancia === idInstancia) {
-        totalInicios += this.alquileres[i].encendidos;
-      }
-    }
-
-    return totalInicios;
+    let alquiler = this.buscarAlquilerPorIDInstancia(idInstancia);
+    if(!alquiler) return 0;
+    return alquiler.encendidos;
   }
   
   /**
@@ -542,69 +543,48 @@ class Sistema {
   }
 
   preCargarDatos() {
-    this.optimizaciones.push(
-      new Optimizacion(
-        OPTIMIZADA_ALMACENAMIENTO,
-        "Optimizada para almacenamiento"
-      )
-    );
-    this.optimizaciones.push(
-      new Optimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo")
-    );
-    this.optimizaciones.push(
-      new Optimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria")
-    );
-    //carga de instancias optimizadas para computo
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10, 10)
-    );
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10, 10)
-    );
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10, 10)
-    );
-    //carga de instancias optimizadas para memoria
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10, 10)
-    );
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10, 10)
-    );
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(10, 100, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10, 10)
-    );
-    //carga de instancias optimizadas para almacenamiento
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(
-        10,
-        100,
-        TAMANIO_MEDIO,
-        OPTIMIZADA_ALMACENAMIENTO,
-        10,
-        10
-      )
-    );
-    this.tiposDeInstanciasDisponibles.push(
-      new TipoInstancia(
-        10,
-        100,
-        TAMANIO_GRANDE,
-        OPTIMIZADA_ALMACENAMIENTO,
-        10,
-        10
-      )
-    );
+    //creacion de distintas optimizaciones
+    this.crearOptimizacion(OPTIMIZADA_ALMACENAMIENTO,"Optimizada para almacenamiento");
+    this.crearOptimizacion(OPTIMIZADA_COMPUTO,"Optimizada para computo");
+    this.crearOptimizacion(OPTIMIZADA_MEMORIA,"Optimizada para memoria");
+    
+    //creacion de instancias disponibles para alquilar
+    this.crearInstancia(20, 2.50, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(30, 3.50, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(50, 6.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10);
 
-    //carga de usuario admin
+    this.crearInstancia(35, 4.00, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(50, 6.50, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(60, 7.00, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10);
+
+    this.crearInstancia(30, 3.50, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10);
+    this.crearInstancia(50, 6.50, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
+    
+
+    //creacion de usuario admin
     this.crearUsuario("Admin", "Admin", "admin", "admin");
     this.usuarios[0].estado = ESTADO_ACTIVO;
     this.usuarios[0].esAdmin = true;
     //carga de usuario comun
     this.crearUsuario("User", "User", "user", "user");
     this.usuarios[1].estado = ESTADO_ACTIVO;
+
+
+    //carga de alquileres al usuario comun
+    let usuario = this.usuarios[1];
+    this.precargarAlquileres(usuario);
+  }
+  
+  precargarAlquileres(usuario)
+  {
+    for(let i = 0; i < 8; i++)
+    {
+      let idInstancia = "INSTANCE_ID_" + i;
+      this.crearAlquilerDeInstancia(usuario, idInstancia);
+    }
   }
 }
+
 
 class Usuario {
   /**Un usuario es unico (ID) y puede alquilar instancias, por default no son admin
@@ -633,22 +613,22 @@ class Usuario {
 class TipoInstancia {
   /**
    *
-   * @param {Number} costoPorEncendido
    * @param {Number} costoPorAlquiler
+   * @param {Number} costoPorEncendido
    * @param {String} tamanio
    * @param {String} tipo
    * @param {Number} stockInicial
    */
   constructor(
-    costoPorEncendido,
     costoPorAlquiler,
+    costoPorEncendido,
     tamanio,
     tipo,
     stockInicial
   ) {
     this.id = "INSTANCE_ID_" + idTipoInstancia++;
-    this.costoPorEncendido = costoPorEncendido;
     this.costoPorAlquiler = costoPorAlquiler;
+    this.costoPorEncendido = costoPorEncendido;
     this.tamanio = tamanio;
     this.tipo = tipo;
     this.stockInicial = stockInicial;

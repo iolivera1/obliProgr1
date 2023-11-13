@@ -120,20 +120,17 @@
         id="divRegistroUsuarioNuevo"
         style="display: none"
       >
-        <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
-        <!-- Subseccion del registro: ingreso de credenciales-->
-        <div class="seccionRegistro" id="divRegistroCredenciales">
+      <!-- Subseccion del registro: ingreso de credenciales-->
+      <div class="seccionRegistro" id="divRegistroCredenciales">
+          <h3>Bienvenido! Por favor registrate si no tienes usuario</h3>
           <label for="txtNombreRegisto">Nombre:</label>
           <input type="text" id="txtNombreRegisto" />
           <label for="txtApellidoRegisto">Apellido:</label>
           <input type="text" id="txtApellidoRegisto" />
-          <br />
           <label for="txtUsernameRegistro">Nombre de usuario:</label>
           <input type="text" id="txtUsernameRegistro" />
-          <br />
           <label for="txtContraseniaRegistro">Contraseña:</label>
           <input type="password" id="txtContraseniaRegistro" />
-          <br />
           <label for="txtContraseniaRepeticionRegistro">
             Repita la contraseña:
           </label>
@@ -170,25 +167,27 @@
       <!--Fin registro de usuario-->
 
       <!--Seccion de alquiler de una instancia-->
-      <div
-        class="seccionPagina visibleUsuario"
-        id="divAlquilerDeInstancias"
-        style="display: none"
-      >
-        <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
-        <label for="slcTipoOptimizacion">Seleccione un tipo de instancia</label>
-        <select id="slcTipoOptimizacion"></select>
-        <br />
-        <br />
-        <div id="divTipoDeInstancia" style="display: none">
-          <label for="slcTipoInstancia">Seleccione una instancia</label>
-          <select id="slcTipoInstancia"></select>
+      <section class="seccionAlquiler">
+        <div
+          class="seccionPagina visibleUsuario"
+          id="divAlquilerDeInstancias"
+          style="display: none"
+        >
+          <h3>Seleccione las caracteristicas de la VM a utilizar</h3>
+          <label for="slcTipoOptimizacion">Seleccione un tipo de instancia</label>
+          <select id="slcTipoOptimizacion"></select>
+          <br />
+          <br />
+          <div id="divTipoDeInstancia" style="display: none">
+            <label for="slcTipoInstancia">Seleccione una instancia</label>
+            <select id="slcTipoInstancia"></select>
+          </div>
+            <br />
+            <button id="btnAlquilarVM">Alquilar instancia</button>
+            <br />
+            <p id="pMsjAlquilerInstancias"></p>
         </div>
-          <br />
-          <button id="btnAlquilarVM">Alquilar instancia</button>
-          <br />
-          <p id="pMsjAlquilerInstancias"></p>
-      </div>
+      </section>
       <!--Fin seccion de alquiler de una instancia-->
 
       <!--Seccion de listado de instancias alquiladas-->
@@ -315,7 +314,7 @@
         id="divInformeInstancias"
         style="display: none"
       >
-        <h3>Visualizacion de Instancias Alquiladas Admin</h3>
+        <h3>Reporte de ingresos</h3>
         <div>
           <table border="4">
             <thead>

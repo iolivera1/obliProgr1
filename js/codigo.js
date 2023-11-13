@@ -177,6 +177,7 @@ function montarOpcionesInstancias()
   if (opcionSelect == -1) 
   {
     document.querySelector(idMsj).innerHTML = MENSAJE_OPCION_INSTANCIA_SELECCIONADA;
+    document.querySelector("#slcTipoInstancia").value = '-1';
     divSelect.style.display = "none";
   } else {
     cargarSelect(opcionSelect, idSelect);
@@ -250,9 +251,9 @@ function mostrarPrecioInstanciaSeleccionada() {
  */
 function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
-  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(opcionSelecionada);
+  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(sistema.usuarioActual, opcionSelecionada);
   limpiarCampos('#divAlquilerDeInstancias');
-  if(mensajeAlquiler === ALQUILER_EXITOSO)
+  if(mensajeAlquiler === MENSAJE_ALQUILER_EXITOSO)
   {
     actualizarTablaInstancias();
     actualizarTablaInstanciasUsuario();
@@ -400,6 +401,29 @@ function modificarStock() {
   actualizarTablaInstancias();
 }
 
+
+function actualizarTablaCostosUsuario() {
+  let usuario = sistema.usuarioActual;
+  if (!usuario) return;
+  let tablaBody = document.querySelector("#tableCostosAcumulados");
+  let instancias = sistema.obtenerInstanciasPorUsuario(usuario.id);
+  let resultado = ``;
+  instancias.forEach((instancia) => {
+    resultado += `
+    <tr>
+    <td>${instancia.tipo + "." + instancia.tamanio}</td>
+    <td>${instancia.costoPorEncendido}</td>
+    <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
+    <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
+    ></tr>`;
+  });
+  tablaBody.innerHTML = resultado;
+
+  document.querySelector("#costoTotalInstancias").innerHTML = 
+  `El costo total es: ${sistema.obtenerGananciaTotal()}`;
+
+}
+
 function actualizarTablaInstanciasUsuario() {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
   let instancias = sistema.obtenerInstanciasPorUsuario(sistema.usuarioActual.id);
@@ -435,28 +459,8 @@ function cambiarEstadoDeInstanciaAlquilada()
   let alquiler = sistema.buscarAlquilerPorIDInstancia(idInstancia);
   sistema.cambiarEstadoDeAlquiler(alquiler);
   actualizarTablaInstanciasUsuario();
-}
-
-function actualizarTablaCostosUsuario() {
-  let usuario = sistema.usuarioActual;
-  if (!usuario) return;
-  let tablaBody = document.querySelector("#tableCostosAcumulados");
-  let instancias = sistema.obtenerInstanciasPorUsuario(usuario.id);
-  let resultado = ``;
-  instancias.forEach((instancia) => {
-    resultado += `
-    <tr>
-    <td>${instancia.tipo + "." + instancia.tamanio}</td>
-    <td>${instancia.costoPorEncendido}</td>
-    <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
-    <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
-    ></tr>`;
-  });
-  tablaBody.innerHTML = resultado;
-
-  document.querySelector("#costoTotalInstancias").innerHTML = 
-  `El costo total es: ${sistema.obtenerGananciaTotal()}`;
-
+  actualizarTablaInstancias();
+  actualizarTablaCostosUsuario();
 }
 
 /** Limpia todos los inputs, selects y parrafos de un div
@@ -465,6 +469,7 @@ function actualizarTablaCostosUsuario() {
  */
 function limpiarCampos(idDiv)
 {
+  if(idDiv === '#divTotalesAPagar' || idDiv === '#ingresoTotalInstancias') return;
   let div = document.querySelector(idDiv);
   let campos = div.querySelectorAll('input, p, select');
   for(let i = 0; i < campos.length; i++)
@@ -479,6 +484,7 @@ function limpiarCampos(idDiv)
         break;
       case 'P':
         campos[i].innerHTML = ``;
+        break;
     }
   }
 }
