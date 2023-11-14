@@ -41,6 +41,7 @@ cargarOptimizaciones("#slcTipoOptimizacion");
 cargarOptimizaciones("#slcStockOptimizacion");
 agregarLogOuts();
 
+
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
  */
@@ -113,7 +114,7 @@ function crearUsuario() {
 
   document.querySelector("#divRegistroFormaDePago").style.display = "block";
   if (!formaDePagoEsValida(nroTarjetaCredito, cvc)) return;
-
+  limpiarCampos("#divRegistroUsuarioNuevo");
   document.querySelector("#pMsjRegistroUsuario").innerHTML =
     MENSAJE_USUARIO_CREADO_CORRECTAMENTE;
   sistema.crearUsuario(nombre, apellido, userName, contrasenia);
@@ -495,8 +496,10 @@ function cambiarEstadoDeInstanciaAlquilada() {
  * @param {String} idDiv
  */
 function limpiarCampos(idDiv) {
-  if (idDiv === "#divTotalesAPagar" || idDiv === "#ingresoTotalInstancias")
+  if (idDiv === "#divTotalesAPagar" || idDiv === "#divInformeInstancias") 
+  {
     return;
+  }
   let div = document.querySelector(idDiv);
   let campos = div.querySelectorAll("input, p, select");
   for (let i = 0; i < campos.length; i++) {

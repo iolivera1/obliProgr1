@@ -11,6 +11,7 @@ const ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO = `${DENIED_ICON} El nombre de usua
 const ERROR_REGISTRO_EXISTE_USUARIO = `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
 const ERROR_REGISTRO_CONTRASENIA_INVALIDA = `${DENIED_ICON} La contraseña debe tener al menos 5 caracteres y por lo menos una letra mayuscula, una minuscula y un numero <br>`;
 const ERROR_REGISTRO_REPETICION_CONTRASENIA = `${DENIED_ICON} Las contraseñas no coinciden <br>`;
+const ERROR_REGISTRO_FORMA_PAGO_VACIA = `${WARNING_ICON} Por favor, ingrese una forma de pago`
 const ERROR_REGISTRO_FORMA_PAGO_INVALIDA = `${WARNING_ICON} La forma de pago ingresada no es valida`;
 const MENSAJE_USUARIO_CREADO_CORRECTAMENTE = `${APPROVED_ICON} Usuario pendiente de activacion`;
 
@@ -309,7 +310,7 @@ class Sistema {
   esTarjetaDeCreditoValida(nroTarjeta, cvc) {
     const LARGO_TARJETA = 16;
     if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3)
-      return ERROR_REGISTRO_FORMA_PAGO_INVALIDA;
+      return ERROR_REGISTRO_FORMA_PAGO_VACIA;
     let tarjetaConDuplicado = this.tarjetaConDuplicado(nroTarjeta);
     let sumaDeDigitos = this.tarjetaConDigitosSumados(tarjetaConDuplicado);
     let resultado = (sumaDeDigitos * 9) % 10;
