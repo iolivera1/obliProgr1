@@ -37,7 +37,6 @@ const MENSAJE_STOCK_INVALIDO = `${DENIED_ICON} El stock debe ser un numero posit
 const MENSAJE_STOCK_MENOR_AL_TOPE = `${DENIED_ICON} El stock no puede ser menor que las instancias ya alquiladas`;
 const MENSAJE_STOCK_MODIFICADO_OK = `${APPROVED_ICON} Stock modificado correctamente`;
 
-
 const INSTANCIA_ENCENDIDA = "Encendida";
 const INSTANCIA_APAGADA = "Apagada";
 
@@ -63,10 +62,15 @@ class Sistema {
    * @returns un mensaje de error si no puede realizar el login, null en otro caso
    */
   login(nombreUsuario, contrasenia) {
-    if(!nombreUsuario || !contrasenia) return MENSAJE_ERROR_LOGIN;
+    if (!nombreUsuario || !contrasenia) return MENSAJE_ERROR_LOGIN;
     let usuario = this.encontrarUsuarioPorNombre(nombreUsuario);
-    if(!usuario || usuario.contrasenia !== contrasenia) return MENSAJE_ERROR_LOGIN;
-    if(usuario.estado === ESTADO_BLOQUEADO || usuario.estado === ESTADO_PENDIENTE) return MENSAJE_USUARIO_INACTIVO;
+    if (!usuario || usuario.contrasenia !== contrasenia)
+      return MENSAJE_ERROR_LOGIN;
+    if (
+      usuario.estado === ESTADO_BLOQUEADO ||
+      usuario.estado === ESTADO_PENDIENTE
+    )
+      return MENSAJE_USUARIO_INACTIVO;
     this.usuarioActual = usuario;
     return null;
   }
@@ -101,8 +105,13 @@ class Sistema {
    * @param {String} contraseniaRepeticion
    * @returns {String} Mensaje de error si algun dato es invalido, null en otro caso
    */
-  validarDatosRegistro(nombre, apellido, nombreUsuario, contrasenia, contraseniaRepeticion) 
-  {
+  validarDatosRegistro(
+    nombre,
+    apellido,
+    nombreUsuario,
+    contrasenia,
+    contraseniaRepeticion
+  ) {
     let msjError = ``;
     msjError += !this.esNombreYApellidoValido(nombre, apellido)
       ? ERROR_REGISTRO_NOMBRE_APELLIDO
@@ -129,8 +138,12 @@ class Sistema {
    * @returns {Boolean} true si alguno de los datos es vacio o un numero, false en otro caso
    */
   esNombreYApellidoValido(nombre, apellido) {
-    return (nombre.length > 0 && apellido.length > 0 
-      && !Number(nombre) && !Number(apellido));
+    return (
+      nombre.length > 0 &&
+      apellido.length > 0 &&
+      !Number(nombre) &&
+      !Number(apellido)
+    );
   }
 
   /**Un nombre de usuario es valido si tiene al menos 4 caracteres y no mas de 20
@@ -173,17 +186,17 @@ class Sistema {
 
   /** Toma un objeto de la clase Usuarios y le cambia el estado
    * Un usuario activo se cambia a bloqueado, y uno pendiente a activo
-   * 
-   * @param {Usuario} usuario 
+   *
+   * @param {Usuario} usuario
    */
-  cambiarEstadoDeUsuario(usuario)
-  {
+  cambiarEstadoDeUsuario(usuario) {
     if (
       usuario.estado === ESTADO_PENDIENTE ||
       usuario.estado === ESTADO_BLOQUEADO
     ) {
       usuario.estado = ESTADO_ACTIVO;
     } else {
+      this.liberarAlquileresUsuario(usuario);
       usuario.estado = ESTADO_BLOQUEADO;
     }
   }
@@ -295,12 +308,15 @@ class Sistema {
    */
   esTarjetaDeCreditoValida(nroTarjeta, cvc) {
     const LARGO_TARJETA = 16;
-    if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3) return ERROR_REGISTRO_FORMA_PAGO_INVALIDA;
+    if (nroTarjeta.length !== LARGO_TARJETA || cvc.length !== 3)
+      return ERROR_REGISTRO_FORMA_PAGO_INVALIDA;
     let tarjetaConDuplicado = this.tarjetaConDuplicado(nroTarjeta);
     let sumaDeDigitos = this.tarjetaConDigitosSumados(tarjetaConDuplicado);
     let resultado = (sumaDeDigitos * 9) % 10;
     let digitoVerificador = Number(nroTarjeta.charAt(nroTarjeta.length - 1));
-    return resultado === digitoVerificador ? null : ERROR_REGISTRO_FORMA_PAGO_INVALIDA;
+    return resultado === digitoVerificador
+      ? null
+      : ERROR_REGISTRO_FORMA_PAGO_INVALIDA;
   }
 
   /** toma cada digito del numero ingresado y duplica solo los que esten en
@@ -367,7 +383,6 @@ class Sistema {
     instancia.stockActual--;
     let nuevoAlquiler = new Alquiler(usuario.id, idInstancia);
     this.alquileres.push(nuevoAlquiler);
-    usuario.alquileres.push(nuevoAlquiler);
     return MENSAJE_ALQUILER_EXITOSO;
   }
 
@@ -403,8 +418,7 @@ class Sistema {
     );
     this.tiposDeInstanciasDisponibles.push(tipoInstancia);
   }
-  crearOptimizacion(prefijo, texto)
-  {
+  crearOptimizacion(prefijo, texto) {
     let optimizacion = new Optimizacion(prefijo, texto);
     this.optimizaciones.push(optimizacion);
   }
@@ -424,8 +438,8 @@ class Sistema {
     return instanciasAlquiladas;
   }
 
-  obtenerEstadoAlquiler(idInstancia) {
-    const alquiler = this.buscarAlquilerPorIDInstancia(idInstancia);
+  obtenerEstadoAlquiler(idAlquiler) {
+    const alquiler = this.buscarAlquilerPorId(idAlquiler);
 
     if (alquiler) {
       return alquiler.encendido ? INSTANCIA_ENCENDIDA : INSTANCIA_APAGADA;
@@ -435,16 +449,17 @@ class Sistema {
   }
 
   /**
-   * 
-   * @param {String} id_instancia 
-   * @param {Number} nuevoStock 
-   * @returns mensaje que puede ser de error si no logra modificar el stock; mensaje de exito si logra modificar 
+   *
+   * @param {String} id_instancia
+   * @param {Number} nuevoStock
+   * @returns mensaje que puede ser de error si no logra modificar el stock; mensaje de exito si logra modificar
    */
   modificarStock(id_instancia, nuevoStock) {
     let instancia = this.buscarInstanciaporID(id_instancia);
     if (!instancia) return MENSAJE_OPCION_INSTANCIA_SELECCIONADA;
     if (isNaN(nuevoStock)) return MENSAJE_STOCK_INVALIDO;
-    let cantidadAlquiladas = this.buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia);
+    let cantidadAlquiladas =
+      this.buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia);
     if (cantidadAlquiladas > nuevoStock) return MENSAJE_STOCK_MENOR_AL_TOPE;
     instancia.stockActual = nuevoStock;
     return MENSAJE_STOCK_MODIFICADO_OK;
@@ -452,7 +467,7 @@ class Sistema {
 
   obtenerStockActual(id_instancia) {
     let instancia = this.buscarInstanciaporID(id_instancia);
-    if(!instancia) return 0;
+    if (!instancia) return 0;
     return instancia.stockActual;
   }
 
@@ -480,7 +495,7 @@ class Sistema {
 
   obtenerGananciaPorAlquiler(alquiler) {
     let tipoInstancia = this.buscarInstanciaporID(alquiler.idInstancia);
-        
+    if (!tipoInstancia) return 0;
     return (
       tipoInstancia.costoPorAlquiler +
       (alquiler.encendidos - 1) * tipoInstancia.costoPorEncendido
@@ -490,17 +505,19 @@ class Sistema {
   obtenerGananciaTotal() {
     let montoTotal = 0;
     for (let i = 0; i < this.tiposDeInstanciasDisponibles.length; i++) {
-        montoTotal += this.obtenerGananciaTotalPorTipoInstancia(this.tiposDeInstanciasDisponibles[i].id);
+      montoTotal += this.obtenerGananciaTotalPorTipoInstancia(
+        this.tiposDeInstanciasDisponibles[i].id
+      );
     }
     return montoTotal;
-}
+  }
 
-  calcularIniciosDeAlquiler(idInstancia) {
-    let alquiler = this.buscarAlquilerPorIDInstancia(idInstancia);
-    if(!alquiler) return 0;
+  calcularIniciosDeAlquiler(idAlquiler) {
+    let alquiler = this.buscarAlquilerPorId(idAlquiler);
+    if (!alquiler) return 0;
     return alquiler.encendidos;
   }
-  
+
   /**
    *
    * @param {Number} id
@@ -518,48 +535,73 @@ class Sistema {
     return encontrada;
   }
 
-  buscarAlquilerPorIDInstancia(idInstancia)
-  {
+  buscarAlquilerPorId(idAlquiler) {
     let encontrada = null;
     let i = 0;
-    while(i < this.alquileres.length && !encontrada)
-    {
-      encontrada = (this.alquileres[i].idInstancia === idInstancia) ? this.alquileres[i] : null;
+    while (i < this.alquileres.length && !encontrada) {
+      encontrada =
+        this.alquileres[i].idAlquiler === idAlquiler
+          ? this.alquileres[i]
+          : null;
       i++;
     }
     return encontrada;
   }
 
-  cambiarEstadoDeAlquiler(alquiler)
-  {
-    if(alquiler.encendido)
-    {
+  cambiarEstadoDeAlquiler(alquiler) {
+    if (alquiler.encendido) {
       alquiler.apagarMaquina();
-    }
-    else
-    {
+    } else {
       alquiler.encenderMaquina();
+    }
+  }
+
+  alquileresDeUsuario(idUsuario) {
+    let alquileres = [];
+
+    for (i = 0; i < this.alquileres.length; i++) {
+      if (this.alquileres[i].idUsuario === idUsuario) {
+        alquileres.push(this.alquileres[i]);
+      }
+    }
+
+    return alquileres;
+  }
+
+  liberarAlquileresUsuario(usuario) {
+    if (!usuario) return;
+    for (i = 0; this.alquileres.length > i; i++) {
+      if (this.alquileres[i].idUsuario == usuario.id) {
+        let tipoInstancia = this.buscarInstanciaporID(
+          this.alquileres[i].idInstancia
+        );
+        tipoInstancia.stockActual++;
+        this.alquileres[i].habilitado = false;
+        this.alquileres.splice(i, 0);
+      }
     }
   }
 
   preCargarDatos() {
     //creacion de distintas optimizaciones
-    this.crearOptimizacion(OPTIMIZADA_ALMACENAMIENTO,"Optimizada para almacenamiento");
-    this.crearOptimizacion(OPTIMIZADA_COMPUTO,"Optimizada para computo");
-    this.crearOptimizacion(OPTIMIZADA_MEMORIA,"Optimizada para memoria");
-    
+    this.crearOptimizacion(
+      OPTIMIZADA_ALMACENAMIENTO,
+      "Optimizada para almacenamiento"
+    );
+    this.crearOptimizacion(OPTIMIZADA_COMPUTO, "Optimizada para computo");
+    this.crearOptimizacion(OPTIMIZADA_MEMORIA, "Optimizada para memoria");
+
     //creacion de instancias disponibles para alquilar
-    this.crearInstancia(20, 2.50, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10);
-    this.crearInstancia(30, 3.50, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10);
-    this.crearInstancia(50, 6.00, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(20, 2.5, TAMANIO_CHICO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(30, 3.5, TAMANIO_MEDIO, OPTIMIZADA_COMPUTO, 10);
+    this.crearInstancia(50, 6.0, TAMANIO_GRANDE, OPTIMIZADA_COMPUTO, 10);
 
-    this.crearInstancia(35, 4.00, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10);
-    this.crearInstancia(50, 6.50, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10);
-    this.crearInstancia(60, 7.00, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(35, 4.0, TAMANIO_CHICO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(50, 6.5, TAMANIO_MEDIO, OPTIMIZADA_MEMORIA, 10);
+    this.crearInstancia(60, 7.0, TAMANIO_GRANDE, OPTIMIZADA_MEMORIA, 10);
 
-    this.crearInstancia(30, 3.50, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10);
-    this.crearInstancia(50, 6.50, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
-    
+    this.crearInstancia(30, 3.5, TAMANIO_MEDIO, OPTIMIZADA_ALMACENAMIENTO, 10);
+    this.crearInstancia(50, 6.5, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
 
     //creacion de usuario admin
     this.crearUsuario("Admin", "Admin", "admin", "admin");
@@ -569,22 +611,18 @@ class Sistema {
     this.crearUsuario("User", "User", "user", "user");
     this.usuarios[1].estado = ESTADO_ACTIVO;
 
-
     //carga de alquileres al usuario comun
     let usuario = this.usuarios[1];
     this.precargarAlquileres(usuario);
   }
-  
-  precargarAlquileres(usuario)
-  {
-    for(let i = 0; i < 8; i++)
-    {
+
+  precargarAlquileres(usuario) {
+    for (let i = 0; i < 8; i++) {
       let idInstancia = "INSTANCE_ID_" + i;
       this.crearAlquilerDeInstancia(usuario, idInstancia);
     }
   }
 }
-
 
 class Usuario {
   /**Un usuario es unico (ID) y puede alquilar instancias, por default no son admin
@@ -605,7 +643,6 @@ class Usuario {
     this.tarjeta = tarjeta;
     this.cvc = cvc;
     this.esAdmin = false;
-    this.alquileres = [];
     this.estado = ESTADO_PENDIENTE;
   }
 }
@@ -648,6 +685,7 @@ class Alquiler {
     this.idInstancia = idInstancia;
     this.encendidos = 1;
     this.encendido = true;
+    this.habilitado = true;
   }
 
   encenderMaquina() {
@@ -670,3 +708,4 @@ class Optimizacion {
     this.texto = texto;
   }
 }
+

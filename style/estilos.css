@@ -321,3 +321,8 @@ input[type="button"]:disabled {
 #txtNuevoStockIngresado{
   width: 20%;
 } 
+
+.divCenter {
+  display: flex;
+  justify-content: center;
+}
