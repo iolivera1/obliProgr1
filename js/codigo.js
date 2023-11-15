@@ -165,8 +165,8 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
   let msjError = sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc);
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
-
-  if (msjError.length > 0) {
+  
+  if (msjError) {
     return false;
   }
 

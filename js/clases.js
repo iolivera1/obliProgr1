@@ -11,7 +11,7 @@ const ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO = `${DENIED_ICON} El nombre de usua
 const ERROR_REGISTRO_EXISTE_USUARIO = `${DENIED_ICON} El nombre de usuario ingresado ya esta en uso <br>`;
 const ERROR_REGISTRO_CONTRASENIA_INVALIDA = `${DENIED_ICON} La contraseña debe tener al menos 5 caracteres y por lo menos una letra mayuscula, una minuscula y un numero <br>`;
 const ERROR_REGISTRO_REPETICION_CONTRASENIA = `${DENIED_ICON} Las contraseñas no coinciden <br>`;
-const ERROR_REGISTRO_FORMA_PAGO_VACIA = `${WARNING_ICON} Por favor, ingrese una forma de pago`
+const ERROR_REGISTRO_FORMA_PAGO_VACIA = `${WARNING_ICON} Por favor, ingrese una forma de pago`;
 const ERROR_REGISTRO_FORMA_PAGO_INVALIDA = `${WARNING_ICON} La forma de pago ingresada no es valida`;
 const MENSAJE_USUARIO_CREADO_CORRECTAMENTE = `${APPROVED_ICON} Usuario pendiente de activacion`;
 
@@ -70,12 +70,13 @@ class Sistema {
   login(nombreUsuario, contrasenia) {
     if (!nombreUsuario || !contrasenia) return MENSAJE_ERROR_LOGIN;
     let usuario = this.encontrarUsuarioPorNombre(nombreUsuario);
-    if (!usuario || usuario.contrasenia !== contrasenia)
-    {
+    if (!usuario || usuario.contrasenia !== contrasenia) {
       return MENSAJE_ERROR_LOGIN;
     }
-    if (usuario.estado === ESTADO_BLOQUEADO || usuario.estado === ESTADO_PENDIENTE) 
-    {
+    if (
+      usuario.estado === ESTADO_BLOQUEADO ||
+      usuario.estado === ESTADO_PENDIENTE
+    ) {
       return MENSAJE_USUARIO_INACTIVO;
     }
     this.usuarioActual = usuario;
@@ -120,25 +121,20 @@ class Sistema {
     contraseniaRepeticion
   ) {
     let msjError = ``;
-    if(!this.esNombreYApellidoValido(nombre, apellido))
-    {
-      msjError += ERROR_REGISTRO_NOMBRE_APELLIDO
+    if (!this.esNombreYApellidoValido(nombre, apellido)) {
+      msjError += ERROR_REGISTRO_NOMBRE_APELLIDO;
     }
-    if(!this.esNombreUsuarioValido(nombreUsuario))
-    {
-      msjError += ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO
+    if (!this.esNombreUsuarioValido(nombreUsuario)) {
+      msjError += ERROR_REGISTRO_NOMBRE_USUARIO_INVALIDO;
     }
-    if(this.existeNombreDeUsuario(nombreUsuario))
-    {
-      msjError += ERROR_REGISTRO_EXISTE_USUARIO
+    if (this.existeNombreDeUsuario(nombreUsuario)) {
+      msjError += ERROR_REGISTRO_EXISTE_USUARIO;
     }
-    if(!this.esContraseniaValida(contrasenia))
-    {
-      msjError += ERROR_REGISTRO_CONTRASENIA_INVALIDA
+    if (!this.esContraseniaValida(contrasenia)) {
+      msjError += ERROR_REGISTRO_CONTRASENIA_INVALIDA;
     }
-    if(!this.contraseniasCoinciden(contrasenia, contraseniaRepeticion))
-    {
-      msjError += ERROR_REGISTRO_REPETICION_CONTRASENIA
+    if (!this.contraseniasCoinciden(contrasenia, contraseniaRepeticion)) {
+      msjError += ERROR_REGISTRO_REPETICION_CONTRASENIA;
     }
     return msjError;
   }
@@ -180,7 +176,7 @@ class Sistema {
    * @returns {Boolean} true si el nombre de usuario que se quiere registrar ya esta en uso
    */
   existeNombreDeUsuario(nombreUsuario) {
-    return (this.encontrarUsuarioPorNombre(nombreUsuario) !== null);
+    return this.encontrarUsuarioPorNombre(nombreUsuario) !== null;
   }
 
   /**Busca un usuario por su nombre de usuario
@@ -211,8 +207,8 @@ class Sistema {
   }
 
   /**
-   * 
-   * @param {Usuario} usuario 
+   *
+   * @param {Usuario} usuario
    * @returns true si el usuario es admin
    */
   esUsuarioAdmin(usuario) {
@@ -393,9 +389,7 @@ class Sistema {
     if (!instancia) {
       return MENSAJE_INSTANCIA_INCORRECTA;
     }
-    let alquiladas = this.buscarCantidadMaquinasAlquiladasPorIdInstancia(idInstancia);
-    if (instancia.stockActual - alquiladas < 1) 
-    {
+    if (instancia.stockActual < 1) {
       return MENSAJE_INSTANCIA_SIN_STOCK;
     }
     instancia.stockActual--;
@@ -429,7 +423,7 @@ class Sistema {
   }
 
   /**Toma un tipo de instancia e intenta modificar su stock actual
-   * 
+   *
    * @param {String} id_instancia
    * @param {Number} nuevoStock
    * @returns mensaje que puede ser de error si no logra modificar el stock; mensaje de exito si logra modificar
@@ -441,7 +435,8 @@ class Sistema {
     let cantidadAlquiladas =
       this.buscarCantidadMaquinasAlquiladasPorIdInstancia(id_instancia);
     if (cantidadAlquiladas > nuevoStock) return MENSAJE_STOCK_MENOR_AL_TOPE;
-    instancia.stockActual = nuevoStock;
+    instancia.stockInicial = nuevoStock;
+    instancia.stockActual = instancia.stockInicial - cantidadAlquiladas;
     return MENSAJE_STOCK_MODIFICADO_OK;
   }
 
@@ -451,8 +446,8 @@ class Sistema {
     return instancia.stockActual;
   }
 
-  /** 
-   * @param {String} id_instancia 
+  /**
+   * @param {String} id_instancia
    * @returns la cantidad de alquileres que existen asociados al tipo de instancia
    */
   buscarCantidadMaquinasAlquiladasPorIdInstancia(idInstancia) {
@@ -461,11 +456,10 @@ class Sistema {
 
   /**Busca dentro de los alquileres, aquellos que tengan el mismo tipo de instancia asociado
    * Esto se hace con el id_instancia, el cual es unico
-   * @param {*} idInstancia 
+   * @param {*} idInstancia
    * @returns array de objetos Alquiler, filtrado por idInstancia
    */
-  buscarAlquileresPorIdInstacia(idInstancia)
-  {
+  buscarAlquileresPorIdInstacia(idInstancia) {
     let alquileresPorId = [];
     for (let i = 0; i < this.alquileres.length; i++) {
       if (this.alquileres[i].idInstancia == idInstancia) {
@@ -476,9 +470,9 @@ class Sistema {
   }
 
   /** calcula la sumatoria los ingresos de todos los alquileres de un tipo especifico
-   * 
-   * @param {String} idInstancia 
-   * @returns 
+   *
+   * @param {String} idInstancia
+   * @returns
    */
   obtenerGananciaTotalPorTipoInstancia(idInstancia) {
     let alquileres = this.buscarAlquileresPorIdInstacia(idInstancia);
@@ -490,33 +484,35 @@ class Sistema {
   }
 
   /** Toma un alquiler y calcula sus ingresos generados
-   * 
-   * @param {Alquiler} alquiler 
-   * @returns 
+   *
+   * @param {Alquiler} alquiler
+   * @returns
    */
   obtenerGananciaPorAlquiler(alquiler) {
     let tipoInstancia = this.buscarInstanciaporID(alquiler.idInstancia);
     if (!tipoInstancia) return 0;
-    return tipoInstancia.costoPorAlquiler + (alquiler.encendidos - 1) * tipoInstancia.costoPorEncendido;
+    return (
+      tipoInstancia.costoPorAlquiler +
+      (alquiler.encendidos - 1) * tipoInstancia.costoPorEncendido
+    );
   }
 
   /** Suma todos los ingresos generados por cada alquiler
-   * 
+   *
    * @returns la sumatoria de todos los ingresos de c/alquiler
    */
   obtenerGananciaTotal() {
     let montoTotal = 0;
-    for (let i = 0; i < this.alquileres.length; i++) 
-    {
+    for (let i = 0; i < this.alquileres.length; i++) {
       montoTotal += this.obtenerGananciaPorAlquiler(this.alquileres[i]);
     }
     return montoTotal;
   }
 
   /** Devuelve la cantidad de veces que se encendió un alquiler
-   * 
-   * @param {Number} idAlquiler 
-   * @returns 
+   *
+   * @param {Number} idAlquiler
+   * @returns
    */
   calcularIniciosDeAlquiler(idAlquiler) {
     let alquiler = this.buscarAlquilerPorId(idAlquiler);
@@ -542,17 +538,15 @@ class Sistema {
   }
 
   /** busca un alquiler por su ID
-   * 
-   * @param {Number} idAlquiler 
-   * @returns un 
+   *
+   * @param {Number} idAlquiler
+   * @returns un
    */
   buscarAlquilerPorId(idAlquiler) {
     let encontrado = null;
     let i = 0;
-    while (i < this.alquileres.length && !encontrado) 
-    {
-      if(this.alquileres[i].idAlquiler === idAlquiler)
-      {
+    while (i < this.alquileres.length && !encontrado) {
+      if (this.alquileres[i].idAlquiler === idAlquiler) {
         encontrado = this.alquileres[i];
       }
       i++;
@@ -561,8 +555,8 @@ class Sistema {
   }
 
   /** Toma un alquiler y si esta encendido, lo apaga y viceversa
-   * 
-   * @param {Alquiler} alquiler 
+   *
+   * @param {Alquiler} alquiler
    */
   cambiarEstadoDeAlquiler(alquiler) {
     if (alquiler.encendido) {
@@ -573,8 +567,8 @@ class Sistema {
   }
 
   /** Filtra de todos los alquileres del sistema, solo los asociados a un usuario
-   * 
-   * @param {Number} idUsuario 
+   *
+   * @param {Number} idUsuario
    * @returns Array de objetos de clase Alquiler
    */
   buscarAlquileresDeUsuario(idUsuario) {
@@ -590,9 +584,9 @@ class Sistema {
   }
 
   /** libera los alquileres del usuario y ajusta el stock para que se puedan volver a alquilar
-   * 
-   * @param {Usuario} usuario 
-   * @returns 
+   *
+   * @param {Usuario} usuario
+   * @returns
    */
   liberarAlquileresUsuario(usuario) {
     if (!usuario) return;
@@ -605,12 +599,12 @@ class Sistema {
   }
 
   /** crea un nuevo tipo de instancia con un stock sobre el cual se pueden realizar alquileres
-   * 
-   * @param {Number} costoAlquiler 
-   * @param {Number} costoEncendido 
-   * @param {String} tamanio 
-   * @param {String} tipo 
-   * @param {Number} stockInicial 
+   *
+   * @param {Number} costoAlquiler
+   * @param {Number} costoEncendido
+   * @param {String} tamanio
+   * @param {String} tipo
+   * @param {Number} stockInicial
    */
   crearInstancia(costoAlquiler, costoEncendido, tamanio, tipo, stockInicial) {
     let tipoInstancia = new TipoInstancia(
@@ -624,9 +618,9 @@ class Sistema {
   }
 
   /** Crea una optimizacion nueva y la agrega al array de optimizaciones
-   * 
-   * @param {String} prefijo 
-   * @param {String} texto 
+   *
+   * @param {String} prefijo
+   * @param {String} texto
    */
   crearOptimizacion(prefijo, texto) {
     let optimizacion = new Optimizacion(prefijo, texto);
@@ -635,7 +629,10 @@ class Sistema {
 
   preCargarDatos() {
     //creacion de distintas optimizaciones
-    this.crearOptimizacion(OPTIMIZADA_ALMACENAMIENTO, TEXTO_OPTIMIZADA_ALMACENTAMIENTO);
+    this.crearOptimizacion(
+      OPTIMIZADA_ALMACENAMIENTO,
+      TEXTO_OPTIMIZADA_ALMACENTAMIENTO
+    );
     this.crearOptimizacion(OPTIMIZADA_COMPUTO, TEXTO_OPTIMIZADA_COMPUTO);
     this.crearOptimizacion(OPTIMIZADA_MEMORIA, TEXTO_OPTIMIZADA_MEMORIA);
 
@@ -652,20 +649,21 @@ class Sistema {
     this.crearInstancia(50, 6.5, TAMANIO_GRANDE, OPTIMIZADA_ALMACENAMIENTO, 10);
 
     //creacion de usuario admin
-    this.crearUsuario("Admin", "Admin", "admin", "admin");
-    this.usuarios[0].estado = ESTADO_ACTIVO;
-    this.usuarios[0].esAdmin = true;
+    for (let i = 0; i < 5; i++) {
+      this.crearUsuario(`admin${i}`, `admin${i}`, `admin${i}`, `admin${i}`);
+      this.usuarios[i].estado = ESTADO_ACTIVO;
+      this.usuarios[i].esAdmin = true;
+    }
     //carga de usuario comun
-    this.crearUsuario("User", "User", "user", "user");
-    this.usuarios[1].estado = ESTADO_ACTIVO;
-
-    //carga de alquileres al usuario comun
-    let usuario = this.usuarios[1];
-    this.precargarAlquileres(usuario.id);
+    for (let i = 5; i < 10; i++) {
+      this.crearUsuario(`user${i}`, `user${i}`, `user${i}`, `user${i}`);
+      this.usuarios[i].estado = ESTADO_ACTIVO;
+      this.precargarAlquileres(this.usuarios[i].id);
+    }
   }
 
   precargarAlquileres(idUsuario) {
-    for (let i = 0; i < 8 ; i++) {
+    for (let i = 0; i < this.tiposDeInstanciasDisponibles.length; i++) {
       let idInstancia = "INSTANCE_ID_" + i;
       this.crearAlquilerDeInstancia(idUsuario, idInstancia);
     }
@@ -722,7 +720,7 @@ class TipoInstancia {
 }
 
 /**
- * Un alquiler esta asociado a un usuario y a un tipo de instancia para identificar sus caracteristicas  
+ * Un alquiler esta asociado a un usuario y a un tipo de instancia para identificar sus caracteristicas
  */
 class Alquiler {
   /**
