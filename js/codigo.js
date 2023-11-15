@@ -174,7 +174,7 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
 }
 
 /**
- * En la seccion alquiler, carga el segundo combo box dinamicamente usando el value del primer combo box
+ * En la seccion alquiler (o en seccion de stock), carga el segundo combo box dinamicamente usando el value del primer combo box
  * this seria en este contexto, el elemento <option> seleccionado en el primer select
  */
 function montarOpcionesInstancias() {
@@ -268,10 +268,8 @@ function mostrarPrecioInstanciaSeleccionada() {
  */
 function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
-  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(
-    sistema.usuarioActual,
-    opcionSelecionada
-  );
+  let idUsuario = sistema.usuarioActual.id;
+  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(idUsuario, opcionSelecionada);
   limpiarCampos("#divAlquilerDeInstancias");
   if (mensajeAlquiler === MENSAJE_ALQUILER_EXITOSO) {
     actualizarTablaInstancias();
@@ -324,7 +322,7 @@ function logout() {
 
 function verAlquileresDeInstancias() {
   document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML = ``;
-  let alquileres = sistema.alquileresDeUsuarioActual();
+  let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
   if (!alquileres.length) return;
 
   let tablaBody = ``;
@@ -383,7 +381,7 @@ function actualizarTablaInstancias() {
     resultado += `
     <tr>
     <td>${instancia.tipo + "." + instancia.tamanio}</td>
-    <td>${sistema.calcularIniciosDeAlquiler(instancia.id)}</td>
+    <td>${sistema.buscarCantidadMaquinasAlquiladasPorIdInstancia(instancia.id)}</td>
     <td>${sistema.obtenerStockActual(instancia.id)}</td>
     <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
     ></tr>`;
@@ -419,7 +417,7 @@ function modificarStock() {
 
 function actualizarTablaCostosUsuario() {
   let tablaBody = document.querySelector("#tableCostosAcumulados");
-  let alquileres = sistema.alquileresDeUsuario(sistema.usuarioActual.id);
+  let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
   let resultado = ``;
   alquileres.forEach((alquiler) => {
     let tipoInstanciaAlquilada = sistema.buscarInstanciaporID(
@@ -444,7 +442,7 @@ function actualizarTablaCostosUsuario() {
 
 function actualizarTablaInstanciasUsuario() {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
-  let alquileres = sistema.alquileresDeUsuario(sistema.usuarioActual.id);
+  let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
   let resultado = "";
   alquileres.forEach((alquiler) => {
     if (alquiler.habilitado) {
