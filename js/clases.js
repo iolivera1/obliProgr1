@@ -497,6 +497,17 @@ class Sistema {
     );
   }
 
+  obtenerCostoTotalDeUsuario(idUsuario)
+  {
+    let alquileresUsuario = this.buscarAlquileresDeUsuario(idUsuario);
+    let montoTotal = 0;
+    for(let i = 0; i < alquileresUsuario.length; i++)
+    {
+      montoTotal += this.obtenerGananciaPorAlquiler(alquileresUsuario[i]);
+    }
+    return montoTotal;
+  }
+
   /** Suma todos los ingresos generados por cada alquiler
    *
    * @returns la sumatoria de todos los ingresos de c/alquiler
