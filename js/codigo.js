@@ -79,6 +79,9 @@ function mostrarPagina(id) {
   document.querySelector(id).style.display = "block";
 }
 
+/**
+ * Toma los botones de logout y les carga la funcionalidad
+ */
 function agregarLogOuts() {
   let botones = document.querySelectorAll(".aLogOut");
 
@@ -205,6 +208,10 @@ function montarOpcionesInstancias() {
   }
 }
 
+/**
+ * Dependiendo de el valor del select de instancias (this.value) muestra un mensaje de error 
+ * o carga el segundo select de opciones
+ */
 function montarOpcionesStockInstancias() {
   document.querySelector("#pMsjStockInstancias").innerHTML = `<br><br>`;
 
@@ -221,6 +228,9 @@ function montarOpcionesStockInstancias() {
   }
 }
 
+/**
+ * Si el filtro de vistas de instancias cambia, la tabla de instancias se actualiza
+ */
 function filtrarEstadoMaquinasVirtuales() {
   let option = Number(this.value);
   if (option === -1) {
@@ -242,8 +252,8 @@ function cargarOptimizaciones(id) {
   document.querySelector(id).innerHTML = options;
 }
 
-/** Carga el segundo select de alquiler de forma dinamica
- *
+/** Carga el segundo select de alquiler de forma dinamica, 
+ * dependiendo de la optimizacion elegida en el primer select
  */
 function cargarSelect(tipo, id) {
   let instancias = sistema.filtrarTiposDeInstanciasPorOptimizacion(tipo);
@@ -257,8 +267,8 @@ function cargarSelect(tipo, id) {
 }
 
 /**
- * Toma los atributos de la opcion seleccionada y los muestra en pantalla
- * Los atributos son el precio de alquiler y precio de la instancia seleccionada
+ * Toma las propiedades de la opcion seleccionada y los muestra en pantalla
+ * Las propiedades son el precio de alquiler y precio de la instancia seleccionada
  */
 function mostrarPrecioInstanciaSeleccionada() {
   document.querySelector("#pMsjAlquilerInstancias").innerHTML = ``;
@@ -328,6 +338,10 @@ function mostarPrimeraPagina() {
   }
 }
 
+/**
+ * Lleva acabo el logout, saca los headers de navegacion y muestra el login
+ * tambien se remueve el usuario actual
+ */
 function logout() {
   mostrarPagina("#divLoginUsuario");
   document.querySelector("#cabezalAdmin").style.display = "none";
@@ -335,24 +349,9 @@ function logout() {
   sistema.logout();
 }
 
-function verAlquileresDeInstancias() {
-  document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML = ``;
-  let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
-  if (!alquileres.length) return;
-
-  let tablaBody = ``;
-  for (let i = 0; i < alquileres.length; i++) {
-    let alquiler = alquileres[i];
-    let instancia = sistema.buscarInstanciaporID(alquiler.idInstancia);
-    let estado = alquiler.estado ? INSTANCIA_ENCENDIDA : INSTANCIA_ENCENDIDA;
-    let fila = `<tr><td>${instancia.tipo}</td> <td>${estado}</td> <td>${alquiler.encendidos}</td> <td>boton</td></tr>`;
-    tablaBody += fila;
-  }
-  document.querySelector("#tablaListadoDeInstanciasUsuario").innerHTML =
-    tablaBody;
-  mostrarPagina("#divListadoDeInstancias");
-}
-
+/** ADMIN ONLY
+ * carga la tabla de usuarios registrados en el sistema
+ */
 function actualizarTablaUsuario() {
   let tabla = document.querySelector("#tablaUsuarios");
   let usuarios = sistema.usuarios;
@@ -367,18 +366,24 @@ function actualizarTablaUsuario() {
     </button></td></tr>`;
   });
   tabla.innerHTML = resultado;
-  actualizarEventosBotonesTabla();
+  actualizarBotonesTablaUsuarios();
 }
 
 actualizarTablaUsuario();
 
-function actualizarEventosBotonesTabla() {
+/**
+ * Toma los botones de la tabla usuarios y les otorga su funcionalidad
+ */
+function actualizarBotonesTablaUsuarios() {
   let botones = document.querySelectorAll(".btnAlternarEstadoUsuario");
   for (let i = 0; i < botones.length; i++) {
     botones[i].addEventListener("click", actualizarEstadoUsuario);
   }
 }
 
+/**
+ * Cambia el estado de usuario segun id, la cual esta cargada como value del boton que dispare el evento
+ */
 function actualizarEstadoUsuario() {
   const idUsuario = Number(this.value);
   let usuario = sistema.encontrarUsuarioPorId(idUsuario);
@@ -388,6 +393,9 @@ function actualizarEstadoUsuario() {
   actualizarTablaInstancias();
 }
 
+/**ADMIN ONLY
+ * Carga la tabla de stock de instancias, calculando el ingreso total y el ingreso parcial por cada TipoInstancia
+ */
 function actualizarTablaInstancias() {
   let tablaBody = document.querySelector("#tableListadoInstancias");
   let instancias = sistema.tiposDeInstanciasDisponibles;
@@ -412,6 +420,9 @@ function actualizarTablaInstancias() {
 
 actualizarTablaInstancias();
 
+/**
+ * En la pantalla de alquiler, muestra el precio de alquiler y de encendido de la instancia seleccionada
+ */
 function mostrarStockInstanciaSeleccionada() {
   const id_instancia = this.value;
   let instanciaSeleccionada = sistema.buscarInstanciaporID(id_instancia);
@@ -422,6 +433,10 @@ function mostrarStockInstanciaSeleccionada() {
   document.querySelector("#pMsjStockActual").innerHTML = msjStock;
 }
 
+/**
+ * Modifica el stock del tipoInstancia seleccionada, si es posible
+ * Muestra un mensaje al terminar, puede ser de error o no
+ */
 function modificarStock() {
   const id_instancia = document.querySelector("#slcStockInstancia").value;
   const nuevoStock = Number(
@@ -432,6 +447,9 @@ function modificarStock() {
   actualizarTablaInstancias();
 }
 
+/**
+ * Carga la tabla de costos para el usuario, con todos sus alquileres y el costo total
+ */
 function actualizarTablaCostosUsuario() {
   let tablaBody = document.querySelector("#tableCostosAcumulados");
   let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
@@ -457,6 +475,9 @@ function actualizarTablaCostosUsuario() {
   ).innerHTML = `El costo total es: ${sistema.obtenerCostoTotalDeUsuario(sistema.usuarioActual.id)}`;
 }
 
+/**
+ * carga la tabla de alquileres del usuario actual, incluyendo sus botones de apagado y encendido
+ */
 function actualizarTablaInstanciasUsuario() {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
   let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
@@ -492,6 +513,10 @@ function actualizarTablaInstanciasUsuario() {
   agregarFuncionalidadBotonesInstancias();
 }
 
+/**Carga la tabla de alquileres del usuario teniendo en cuenta el filtro de apagadas/encendidas
+ * 
+ * @param {*} estado 
+ */
 function actualizarTablaInstanciasUsuarioFiltrada(estado) {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
   let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
@@ -525,6 +550,9 @@ function actualizarTablaInstanciasUsuarioFiltrada(estado) {
   agregarFuncionalidadBotonesInstancias();
 }
 
+/**
+ * Agrega la funcionalidad a los botones de encendido/apagado de los alquileres
+ */
 function agregarFuncionalidadBotonesInstancias() {
   let botones = document.querySelectorAll(".btnCambiarEstadoInstancia");
   for (let i = 0; i < botones.length; i++) {
@@ -532,6 +560,10 @@ function agregarFuncionalidadBotonesInstancias() {
   }
 }
 
+/**
+ * si el alquiler esta encendido, lo apaga y viceversa
+ * actualiza la tabla de alquileres respetando el filtro
+ */
 function cambiarEstadoDeInstanciaAlquilada() {
   let idAlquiler = Number(this.value);
   let alquiler = sistema.buscarAlquilerPorId(idAlquiler);
