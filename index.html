@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="style/estilos.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
     <title>OBLIGATORIO - OLIVERA y OLIVERI</title>
   </head>
   <body>
@@ -148,7 +148,7 @@
             style="display: none"
           >
             <label for="txtTarjetaCreditoNumero">Tarjeta de credito:</label>
-            <input type="text" id="txtTarjetaCreditoNumero"/>
+            <input type="text" id="txtTarjetaCreditoNumero" />
             <br />
             <label for="txtCVC">CVC:</label>
             <input type="text" id="txtCVC" />
@@ -203,6 +203,14 @@
           style="display: none"
         >
           <h3>Visualizacion de instancias alquiladas</h3>
+          <br />
+          <br />
+          <label for="slcEstadoAlquiler">Filtro estado</label>
+          <select id="slcEstadoAlquiler">
+            <option value="-1">Seleccione filtro</option>
+            <option value="0">Apagadas</option>
+            <option value="1">Encendidas</option>
+          </select>
           <br />
           <br />
           <div>

@@ -33,6 +33,10 @@ document
   .querySelector("#btnAlquilarVM")
   .addEventListener("click", alquilarMaquinaVirtual);
 
+document
+  .querySelector("#slcEstadoAlquiler")
+  .addEventListener("change", filtrarEstadoMaquinasVirtuales);
+
 //fin eventos fijos
 
 habilitarNavegacion();
@@ -40,7 +44,6 @@ mostrarPagina("#divLoginUsuario");
 cargarOptimizaciones("#slcTipoOptimizacion");
 cargarOptimizaciones("#slcStockOptimizacion");
 agregarLogOuts();
-
 
 /**
  * Le da funcionalidad a los botones para navegar entre distintas partes de la pagina
@@ -165,7 +168,7 @@ function formaDePagoEsValida(nroTarjetaCredito, cvc) {
   let msjError = sistema.esTarjetaDeCreditoValida(nroTarjetaCredito, cvc);
 
   document.querySelector("#pMsjRegistroUsuario").innerHTML = msjError;
-  
+
   if (msjError) {
     return false;
   }
@@ -216,6 +219,15 @@ function montarOpcionesStockInstancias() {
     cargarSelect(opcionSelect, "#slcStockInstancia");
     divSelect.style.display = "block";
   }
+}
+
+function filtrarEstadoMaquinasVirtuales() {
+  let option = Number(this.value);
+  if (option === -1) {
+    actualizarTablaInstanciasUsuario()
+    return;
+  }
+  actualizarTablaInstanciasUsuarioFiltrada(option);
 }
 
 /**
@@ -269,7 +281,10 @@ function mostrarPrecioInstanciaSeleccionada() {
 function alquilarMaquinaVirtual() {
   let opcionSelecionada = document.querySelector("#slcTipoInstancia").value;
   let idUsuario = sistema.usuarioActual.id;
-  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(idUsuario, opcionSelecionada);
+  let mensajeAlquiler = sistema.crearAlquilerDeInstancia(
+    idUsuario,
+    opcionSelecionada
+  );
   limpiarCampos("#divAlquilerDeInstancias");
   if (mensajeAlquiler === MENSAJE_ALQUILER_EXITOSO) {
     actualizarTablaInstancias();
@@ -381,7 +396,9 @@ function actualizarTablaInstancias() {
     resultado += `
     <tr>
     <td>${instancia.tipo + "." + instancia.tamanio}</td>
-    <td>${sistema.buscarCantidadMaquinasAlquiladasPorIdInstancia(instancia.id)}</td>
+    <td>${sistema.buscarCantidadMaquinasAlquiladasPorIdInstancia(
+      instancia.id
+    )}</td>
     <td>${sistema.obtenerStockActual(instancia.id)}</td>
     <td>${sistema.obtenerGananciaTotalPorTipoInstancia(instancia.id)}</td
     ></tr>`;
@@ -443,9 +460,44 @@ function actualizarTablaCostosUsuario() {
 function actualizarTablaInstanciasUsuario() {
   let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
   let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
+
   let resultado = "";
   alquileres.forEach((alquiler) => {
     if (alquiler.habilitado) {
+      let tipoInstanciaAlquilada = sistema.buscarInstanciaporID(
+        alquiler.idInstancia
+      );
+      let textoBoton =
+        sistema.obtenerEstadoAlquiler(alquiler.idAlquiler) ===
+        INSTANCIA_ENCENDIDA
+          ? "apagar"
+          : "encender";
+
+      resultado += `
+        <tr>
+        <td>${
+          tipoInstanciaAlquilada.tipo + "." + tipoInstanciaAlquilada.tamanio
+        }</td> 
+        <td>${sistema.obtenerEstadoAlquiler(alquiler.idAlquiler)}</td>
+        <td>${sistema.calcularIniciosDeAlquiler(alquiler.idAlquiler)}</td>
+        <td><button class="btnCambiarEstadoInstancia" value="${
+          alquiler.idAlquiler
+        }">${textoBoton}</button>
+        </td>
+        </tr>`;
+    }
+  });
+
+  tablaBody.innerHTML = resultado;
+  agregarFuncionalidadBotonesInstancias();
+}
+
+function actualizarTablaInstanciasUsuarioFiltrada(estado) {
+  let tablaBody = document.querySelector("#tablaListadoDeInstanciasUsuario");
+  let alquileres = sistema.buscarAlquileresDeUsuario(sistema.usuarioActual.id);
+  let resultado = "";
+  alquileres.forEach((alquiler) => {
+    if (alquiler.habilitado && alquiler.encendido == estado) {
       let tipoInstanciaAlquilada = sistema.buscarInstanciaporID(
         alquiler.idInstancia
       );
@@ -483,10 +535,15 @@ function agregarFuncionalidadBotonesInstancias() {
 function cambiarEstadoDeInstanciaAlquilada() {
   let idAlquiler = Number(this.value);
   let alquiler = sistema.buscarAlquilerPorId(idAlquiler);
+  let valorFiltro = Number(document.querySelector("#slcEstadoAlquiler").value);
   sistema.cambiarEstadoDeAlquiler(alquiler);
-  actualizarTablaInstanciasUsuario();
   actualizarTablaInstancias();
   actualizarTablaCostosUsuario();
+  if (valorFiltro === -1) {
+    actualizarTablaInstanciasUsuario();
+  } else {
+    actualizarTablaInstanciasUsuarioFiltrada(valorFiltro);
+  }
 }
 
 /** Limpia todos los inputs, selects y parrafos de un div
@@ -494,8 +551,7 @@ function cambiarEstadoDeInstanciaAlquilada() {
  * @param {String} idDiv
  */
 function limpiarCampos(idDiv) {
-  if (idDiv === "#divTotalesAPagar" || idDiv === "#divInformeInstancias") 
-  {
+  if (idDiv === "#divTotalesAPagar" || idDiv === "#divInformeInstancias") {
     return;
   }
   let div = document.querySelector(idDiv);
